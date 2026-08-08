@@ -121,6 +121,47 @@
   if (document.readyState === 'complete') revealSafely();
   else window.addEventListener('load', function(){ setTimeout(revealSafely, 400); });
   window.addEventListener('scroll', revealSafely, {passive:true});
+
+  /* stack servizi MOBILE: il titolo della card parzialmente coperta "cavalca"
+     il bordo di copertura — sale restando visibile nello slice non coperto.
+     I tag e il numero restano fermi (come da note utente). Solo su mobile. */
+  var stackCards = document.querySelectorAll('.stack .card');
+  if (stackCards.length > 1 && window.matchMedia('(max-width:900px)').matches){
+    var tOff = [], tH = [];
+    function measureTitles(){
+      stackCards.forEach(function(c,i){
+        var t = c.querySelector('.ttl');
+        tOff[i] = t ? t.getBoundingClientRect().top - c.getBoundingClientRect().top : 0;
+        tH[i] = t ? t.getBoundingClientRect().height : 0;
+      });
+    }
+    measureTitles();
+    window.addEventListener('load', function(){ setTimeout(measureTitles, 350); });
+    window.addEventListener('resize', measureTitles);
+    for (var i = 0; i < stackCards.length - 1; i++){
+      var _t = stackCards[i].querySelector('.ttl');
+      if (_t) _t.style.willChange = 'transform, opacity';
+    }
+    function riseTitles(){
+      var vh = window.innerHeight;
+      for (var i = 0; i < stackCards.length - 1; i++){
+        var t = stackCards[i].querySelector('.ttl'); if (!t) continue;
+        var coverY = stackCards[i+1].getBoundingClientRect().top;
+        coverY = Math.max(0, Math.min(vh, coverY));
+        var natTop = stackCards[i].getBoundingClientRect().top + tOff[i];
+        var rise = 0, fade = 1;
+        if (coverY < natTop + tH[i]){
+          var desired = coverY - tH[i] - 18;         /* titolo appena sopra il bordo */
+          if (desired < 16) desired = 16;
+          rise = Math.min(0, desired - natTop);      /* negativo = sale */
+          fade = Math.max(0, Math.min(1, (coverY - 36) / 100));  /* svanisce in cima */
+        }
+        t.style.transform = rise ? 'translateY(' + rise.toFixed(1) + 'px)' : '';
+        t.style.opacity = fade < 1 ? fade.toFixed(2) : '';
+      }
+    }
+    (function riseLoop(){ riseTitles(); requestAnimationFrame(riseLoop); })();
+  }
   function runCount(box){
     var el = box.querySelector('.cnt'); if (!el || !el.dataset.to) return;
     var to = +el.dataset.to, cur = 0, step = Math.max(1, Math.round(to / 50));
