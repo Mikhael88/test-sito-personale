@@ -123,9 +123,12 @@ h1.hero-title{font-family:var(--font-display);font-weight:600;line-height:.98;le
 .stat-num b{color:var(--accent);margin-right:2px}
 .stat-label{color:var(--t-muted);font-size:15px;margin-top:12px}
 
-/* ---------- SERVICES (stack overlap) - bianco/verde/lavanda ---------- */
-.stack{max-width:1600px;margin:0 auto;padding:20px 24px 150px}
-.card{position:sticky;top:70px;height:64vh;min-height:520px;margin-bottom:-6vh;border-radius:var(--r-l);overflow:hidden;padding:44px 6vw;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 30px 70px rgba(0,0,0,.55);will-change:transform;width:100%}
+/* ---------- SERVICES (stack overlap a mazzetto) - bianco/verde/lavanda ---------- */
+.stack{max-width:1600px;margin:0 auto;padding:20px 24px 260px}
+.card{position:sticky;top:70px;height:78vh;min-height:520px;margin-bottom:calc(-78vh + 72px);border-radius:var(--r-l);overflow:hidden;padding:44px 6vw;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 30px 70px rgba(0,0,0,.55);will-change:transform;width:100%}
+.card:nth-child(1){top:70px}
+.card:nth-child(2){top:142px}
+.card:nth-child(3){top:214px}
 .card:last-child{margin-bottom:0}
 .card .top{display:flex;justify-content:space-between;align-items:flex-start}
 .card .tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
