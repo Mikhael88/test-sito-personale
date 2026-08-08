@@ -122,62 +122,6 @@
   else window.addEventListener('load', function(){ setTimeout(revealSafely, 400); });
   window.addEventListener('scroll', revealSafely, {passive:true});
 
-  /* stack servizi MOBILE: il titolo della card parzialmente coperta "cavalca"
-     il bordo di copertura — sale restando visibile nello slice non coperto.
-     I tag e il numero restano fermi (come da note utente). Solo su mobile. */
-  var stackCards = document.querySelectorAll('.stack .card');
-  if (stackCards.length > 1 && window.matchMedia('(max-width:900px)').matches){
-    var tOff = [], tH = [];
-    /* Misura accumulando offsetTop lungo la catena fino alla CARD:
-       .ttl -> .mid -> .card (mid è position:relative, quindi è lui l'offsetParent
-       di .ttl, NON la card). Prima misurava solo 169px invece di ~365 -> il
-       titolo "cavalcava" sotto il bordo -> spariva. Valori di layout, immuni
-       ai transform e al resize della barra URL. */
-    function offsetFromCard(el, card){
-      var o = 0, cur = el;
-      while (cur && cur !== card && cur.offsetParent){
-        o += cur.offsetTop;
-        cur = cur.offsetParent;
-      }
-      return o;
-    }
-    function measureTitles(){
-      for (var i = 0; i < stackCards.length; i++){
-        var c = stackCards[i], t = c.querySelector('.ttl');
-        if (t){ tOff[i] = offsetFromCard(t, c); tH[i] = t.offsetHeight; }
-        else { tOff[i] = 0; tH[i] = 0; }
-      }
-    }
-    measureTitles();
-    window.addEventListener('load', function(){ setTimeout(measureTitles, 400); });
-    var _rsz; window.addEventListener('resize', function(){ clearTimeout(_rsz); _rsz = setTimeout(measureTitles, 150); });
-    for (var i = 0; i < stackCards.length - 1; i++){
-      var _t = stackCards[i].querySelector('.ttl');
-      if (_t) _t.style.willChange = 'transform, opacity';
-    }
-    function riseTitles(){
-      var vh = window.innerHeight;
-      for (var i = 0; i < stackCards.length - 1; i++){
-        try {
-          var t = stackCards[i].querySelector('.ttl'); if (!t || !tH[i]) continue;
-          var coverY = stackCards[i+1].getBoundingClientRect().top;
-          if (coverY > vh){ if (t.style.transform) { t.style.transform=''; t.style.opacity=''; } continue; }
-          if (coverY < 0) coverY = 0;
-          var natTop = stackCards[i].getBoundingClientRect().top + tOff[i];
-          var rise = 0, fade = 1;
-          if (coverY < natTop + tH[i]){
-            var desired = coverY - tH[i] - 16;    /* titolo appena sopra il bordo */
-            if (desired < 24) desired = 24;
-            rise = Math.min(0, desired - natTop); /* negativo = sale */
-            fade = Math.max(0, Math.min(1, (coverY - 30) / 150)); /* fade dolce in cima */
-          }
-          t.style.transform = rise < -0.5 ? 'translateY(' + rise.toFixed(1) + 'px)' : '';
-          t.style.opacity = fade < 1 ? fade.toFixed(2) : '';
-        } catch(e){}
-      }
-    }
-    (function riseLoop(){ riseTitles(); requestAnimationFrame(riseLoop); })();
-  }
   function runCount(box){
     var el = box.querySelector('.cnt'); if (!el || !el.dataset.to) return;
     var to = +el.dataset.to, cur = 0, step = Math.max(1, Math.round(to / 50));
