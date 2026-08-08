@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="it" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DEBUG stack servizi</title>
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+/* FORZA le regole mobile anche su viewport larghi (per il banco di prova) */
+.sec-head.max-wide,.case-head,.blog-head{padding-left:24px;padding-right:24px}
+.sec-head.max-wide{flex-direction:column;align-items:flex-start;gap:14px}
+.stack{padding:0}
+.card{position:sticky;top:0;height:100svh;min-height:0;padding:120px 9vw 40px;width:100%;border-radius:0;margin:0;box-shadow:none}
+.card .ttl small{display:none}
+.card .ttl{font-size:clamp(32px,10.5vw,54px);max-width:100%;overflow-wrap:break-word;padding-right:6px}
+.card .mid{flex-direction:column;align-items:flex-start;justify-content:center}
+.card .glb{position:absolute;right:6%;bottom:calc(44px + env(safe-area-inset-bottom));transform:none;width:min(70%,250px);aspect-ratio:1;margin:0}
+.card:last-child{margin-bottom:0}
+#dbg{position:fixed;top:8px;left:8px;z-index:9999;background:rgba(0,0,0,.85);color:#0f0;font:11px/1.5 monospace;padding:10px 12px;border-radius:8px;max-width:94vw;white-space:pre;pointer-events:none}
+#ctl{position:fixed;bottom:8px;left:8px;z-index:9999;display:flex;gap:6px}
+#ctl button{font:12px sans-serif;padding:6px 10px;border-radius:6px;border:1px solid #444;background:#222;color:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+<div id="dbg">loading…</div>
+<div id="ctl"><button onclick="auto=false">⏸ pausa</button><button onclick="sim()">▶ simula</button></div>
+
+<section class="full-bleed" id="servizi">
+  <div class="sec-head rv max-wide">
+    <div><h2 class="sec-title">Servizi 3D</h2></div>
+    <span class="sec-cta">Il viaggio del tuo prodotto, dal fisico al digitale.</span>
+  </div>
+  <div class="stack">
+    <section class="card c-w">
+      <div class="top">
+        <div class="tags"><span>Realtime</span><span>Mouse</span></div>
+        <div class="num">/01</div>
+      </div>
+      <div class="mid">
+        <div class="ttl">Configuratori<small>Il modello reale del tuo prodotto nel sito: l'utente sceglie materiali e opzioni, e ordina.</small></div>
+        <div class="glb"><img src="https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/01_hero-img.webp" alt=""></div>
+      </div>
+    </section>
+    <section class="card c-g">
+      <div class="top">
+        <div class="tags"><span>Rendering</span><span>Simulazioni</span></div>
+        <div class="num">/02</div>
+      </div>
+      <div class="mid">
+        <div class="ttl">Video &amp; animazioni<small>Simulazioni di flusso, movimenti meccanici, render di prodotto che presentano senza foto.</small></div>
+        <div class="glb"><img src="https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/800x800_card-image-02.webp" alt=""></div>
+      </div>
+    </section>
+    <section class="card c-l">
+      <div class="top">
+        <div class="tags"><span>Scan 3D</span><span>Drone</span><span>Splat</span></div>
+        <div class="num">/03</div>
+      </div>
+      <div class="mid">
+        <div class="ttl">Ricostruzione 3D<small>Scansione 3D, fotogrammetria da drone e da camera, Gaussian Splatting: dal fisico alla mesh, anche da campione reale senza file.</small></div>
+        <div class="glb"><img src="https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/800x800_card-image-03.webp" alt=""></div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<script>
+/* COPIA fedele della logica rise (senza guardia matchMedia per il test) */
+var stackCards = document.querySelectorAll('.stack .card');
+var tOff=[], tH=[], dbg=[];
+function measureTitles(){
+  for (var i=0;i<stackCards.length;i++){
+    var c=stackCards[i], t=c.querySelector('.ttl');
+    if (t){ tOff[i]=t.offsetTop; tH[i]=t.offsetHeight; }
+    else { tOff[i]=0; tH[i]=0; }
+  }
+}
+measureTitles();
+window.addEventListener('load',function(){ setTimeout(measureTitles,400); });
+function riseTitles(){
+  var vh=window.innerHeight, out=[];
+  for (var i=0;i<stackCards.length-1;i++){
+    try{
+      var t=stackCards[i].querySelector('.ttl'); if(!t||!tH[i]){ out.push('card'+i+': tH=0, skip'); continue; }
+      var coverY=stackCards[i+1].getBoundingClientRect().top;
+      var reset=coverY>vh;
+      if(coverY<0)coverY=0;
+      var cardTop=stackCards[i].getBoundingClientRect().top;
+      var natTop=cardTop+tOff[i];
+      var rise=0,fade=1;
+      if(coverY<natTop+tH[i]){
+        var desired=coverY-tH[i]-16;
+        if(desired<24)desired=24;
+        rise=Math.min(0,desired-natTop);
+        fade=Math.max(0,Math.min(1,(coverY-30)/150));
+      }
+      if(reset){ t.style.transform=''; t.style.opacity=''; }
+      else {
+        t.style.transform = rise<-0.5 ? 'translateY('+rise.toFixed(1)+'px)' : '';
+        t.style.opacity = fade<1 ? fade.toFixed(2) : '';
+      }
+      out.push('card'+i+' ['+t.textContent.slice(0,14).trim()+'] coverY='+coverY.toFixed(0)+' natTop='+natTop.toFixed(0)+' tH='+tH[i]+' rise='+rise.toFixed(0)+' fade='+fade.toFixed(2)+(reset?' RESET':'')+' ttlTop='+t.getBoundingClientRect().top.toFixed(0));
+    }catch(e){ out.push('card'+i+' ERR '+e.message); }
+  }
+  dbg=out;
+}
+(function riseLoop(){ riseTitles(); requestAnimationFrame(riseLoop); })();
+
+/* simulatore scroll automatico (su/giù) */
+var auto=false, dir=1, y=0;
+function tick(){
+  if(auto){
+    y += dir*4;
+    var max=document.documentElement.scrollHeight-window.innerHeight;
+    if(y>=max){ y=max; dir=-1; }
+    if(y<=0){ y=0; dir=1; }
+    window.scrollTo(0,y);
+  }
+  var el=document.getElementById('dbg');
+  el.textContent = 'w='+innerWidth+' h='+innerHeight+' scrollY='+window.scrollY.toFixed(0)+'\n'+
+    'stackCards='+stackCards.length+' tOff=['+tOff.map(function(v){return v.toFixed(0);}).join(',')+'] tH=['+tH.join(',')+']\n'+
+    dbg.join('\n');
+  requestAnimationFrame(tick);
+}
+function sim(){ auto=true; }
+window.addEventListener('load',function(){ setTimeout(sim,600); });
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>
