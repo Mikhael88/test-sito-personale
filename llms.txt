@@ -1,0 +1,28 @@
+# Faccoli · Digitalizzazione Prodotto
+
+> Consulente per la digitalizzazione del prodotto manifatturiero. Dal fisico al digitale: configuratori 3D, video tecnici, scansione 3D, fotogrammetria e Gaussian Splatting. Brescia, Nord Italia.
+
+## Chi sono
+Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le aziende manifatturiere a portare il loro prodotto dal fisico al digitale: configuratori 3D realtime, simulazioni, render tecniche, acquisizione 3D da campione reale.
+
+## Cosa offro
+- Configuratori 3D realtime (web, embedded nel sito)
+- Video & animazioni tecniche (simulazioni di flusso, movimenti meccanici)
+- Ricostruzione 3D: scansione 3D da oggetto fisico, fotogrammetria (drone e macchina fotografica), Gaussian Splatting
+
+## Dati chiave
+- 15+ anni di esperienza
+- 30+ progetti di digitalizzazione
+- 6 configuratori 3D web live
+- Clienti: Altrenotti, Marmogranito, DND Martinelli, Rizzoli, Unitec, Sunshading, Silverplat, Robosan
+
+## Contatti
+- Email: ciao@faccioli.it
+- Località: Brescia, Italia (servizio su tutto il Nord Italia)
+
+## Pagine
+- [Homepage](https://www.faccioli.it/)
+- [Servizi](https://www.faccioli.it/servizi.html)
+- [Case history](https://www.faccioli.it/case-history.html)
+- [Blog](https://www.faccioli.it/blog.html)
+- [Contatti](https://www.faccioli.it/contatti.html)
