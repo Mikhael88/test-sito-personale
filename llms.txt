@@ -23,6 +23,9 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 ## Pagine
 - [Homepage](https://www.faccioli.it/)
 - [Servizi](https://www.faccioli.it/servizi.html)
+- [Configuratori 3D](https://www.faccioli.it/servizio/configuratori-3d.html)
+- [Video & animazioni tecniche](https://www.faccioli.it/servizio/video-animazioni-tecniche.html)
+- [Ricostruzione 3D](https://www.faccioli.it/servizio/ricostruzione-3d.html)
 - [Case history](https://www.faccioli.it/case-history.html)
 - [Blog](https://www.faccioli.it/blog.html)
 - [Contatti](https://www.faccioli.it/contatti.html)
