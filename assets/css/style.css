@@ -63,6 +63,7 @@ img{display:block;max-width:100%}
 /* ---------- SECTION HEAD ---------- */
 .sec{margin:0 auto;max-width:1280px;padding:70px 48px}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:64px}
+.sec-head.max-wide{max-width:1600px;padding:0 48px;margin-left:auto;margin-right:auto}
 .sec-kicker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--additional);margin-bottom:16px}
 h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(36px,4.6vw,62px);line-height:1;letter-spacing:-.02em}
 .sec-cta{color:var(--t-muted);font-size:14px;white-space:nowrap}
@@ -312,26 +313,46 @@ footer .f-links a:hover{color:var(--accent)}
 @media(max-width:900px){
   .wrap{padding:0 24px}
   .stats{grid-template-columns:repeat(2,1fr);padding:0 24px}
+
+  /* NAV: solida + safe-area, niente blend-mode (causa "slittamento" su mobile) */
+  .nav{padding:calc(12px + env(safe-area-inset-top)) 20px calc(12px + env(safe-area-inset-bottom));mix-blend-mode:normal;background:color-mix(in srgb,var(--base) 84%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+  .nav-links{display:none}
+
+  /* HERO: splash centrata nello schermo visibile (non 100vh che eccede) */
+  .hero{min-height:100vh;min-height:100svh;padding:calc(120px + env(safe-area-inset-top)) 24px 76px;justify-content:center}
+  .hero .scroll-cue{bottom:calc(26px + env(safe-area-inset-bottom))}
+  h1.hero-title{font-size:clamp(40px,13vw,64px)}
+  .hero-sub{font-size:16px;margin-top:24px}
+  .hero-ctas{gap:12px;flex-direction:column;align-items:center}
+
+  /* SERVICI: card sticky con sovrapposizione percettibile (effetto stack) */
   .stack{padding:10px 0 90px}
-  .card{height:auto;min-height:0;padding:30px 6vw;margin-bottom:-9vh;width:94vw}
+  .card{height:auto;min-height:0;padding:30px 6vw;margin-bottom:-10vh;width:94vw}
+  .card{height:max(76svh,470px)}
   .card .ttl small{display:none}
-  .card .glb{position:static;transform:none;width:100%;aspect-ratio:16/10;margin-top:24px}
-  .card .mid{flex-direction:column;align-items:flex-start}
-  .case-head{padding:0 24px;flex-direction:column;align-items:flex-start;gap:16px}
+  .card .ttl{font-size:clamp(32px,11vw,52px)}
+  .card .glb{position:static;transform:none;width:100%;aspect-ratio:16/10;margin-top:22px}
+  .card .mid{flex-direction:column;align-items:flex-start;justify-content:center}
+
+  /* TITOLI sezione: stesso padding sx + letter-spacing coerente (allineati) */
+  .sec-head.max-wide,.case-head,.blog-head{padding-left:24px;padding-right:24px}
+  .sec-head.max-wide{flex-direction:column;align-items:flex-start;gap:14px}
+  .case-head{flex-direction:column;align-items:flex-start;gap:16px}
+  .sec-title{letter-spacing:0}
+  .case-head h2.sec-title{font-size:44px}
+
   .case-card.color{min-width:320px;height:220px;padding:28px}
   .case-card.photo{width:400px;height:220px}
   .bgrid{grid-template-columns:1fr;padding:0 24px;gap:20px}
   .bcard:nth-child(n){grid-column:auto}
   .btitle{font-size:20px}
   .bexcerpt{font-size:14px}
-  .blog-head{padding:0 24px}
+  .blog-head{margin-bottom:36px}
   .blog-head h2.sec-title{font-size:44px}
   .appr{grid-template-columns:1fr}
   .appr-cols{grid-template-columns:1fr}
   .ac-col{padding:28px 24px}
   .float{display:none}
-  .nav-links{display:none}
-  .nav{padding:16px 22px}
   .page-hero{padding:140px 24px 50px}
   .blog-list{padding:0 24px 80px}
   .bpost{flex-direction:column;gap:20px}
@@ -342,6 +363,7 @@ footer .f-links a:hover{color:var(--accent)}
   .cases-grid{grid-template-columns:1fr;padding:0 24px 70px}
   .contact-grid{grid-template-columns:1fr;padding:0 24px 80px;gap:40px}
   .sec{padding:50px 24px}
+  .cta-sec{padding:70px 24px calc(70px + env(safe-area-inset-bottom))}
 }
 @media(prefers-reduced-motion:reduce){
   .marquee-track,.hero-title .word,.float,.scroll-cue,.eyebrow .dot{animation:none!important;transition:none!important;transform:none!important;opacity:1!important}
