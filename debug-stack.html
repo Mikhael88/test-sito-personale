@@ -68,10 +68,15 @@
 /* COPIA fedele della logica rise (senza guardia matchMedia per il test) */
 var stackCards = document.querySelectorAll('.stack .card');
 var tOff=[], tH=[], dbg=[];
+function offsetFromCard(el, card){
+  var o=0, cur=el;
+  while (cur && cur !== card && cur.offsetParent){ o+=cur.offsetTop; cur=cur.offsetParent; }
+  return o;
+}
 function measureTitles(){
   for (var i=0;i<stackCards.length;i++){
     var c=stackCards[i], t=c.querySelector('.ttl');
-    if (t){ tOff[i]=t.offsetTop; tH[i]=t.offsetHeight; }
+    if (t){ tOff[i]=offsetFromCard(t,c); tH[i]=t.offsetHeight; }
     else { tOff[i]=0; tH[i]=0; }
   }
 }

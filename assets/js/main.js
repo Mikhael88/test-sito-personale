@@ -128,13 +128,23 @@
   var stackCards = document.querySelectorAll('.stack .card');
   if (stackCards.length > 1 && window.matchMedia('(max-width:900px)').matches){
     var tOff = [], tH = [];
-    /* Misuro con offsetTop/offsetHeight (valori di LAYOUT, immuni ai transform):
-       con getBoundingClientRect, il resize della barra URL mobile mentre i
-       titoli erano già traslati corrompeva le misure -> titoli sparivano. */
+    /* Misura accumulando offsetTop lungo la catena fino alla CARD:
+       .ttl -> .mid -> .card (mid è position:relative, quindi è lui l'offsetParent
+       di .ttl, NON la card). Prima misurava solo 169px invece di ~365 -> il
+       titolo "cavalcava" sotto il bordo -> spariva. Valori di layout, immuni
+       ai transform e al resize della barra URL. */
+    function offsetFromCard(el, card){
+      var o = 0, cur = el;
+      while (cur && cur !== card && cur.offsetParent){
+        o += cur.offsetTop;
+        cur = cur.offsetParent;
+      }
+      return o;
+    }
     function measureTitles(){
       for (var i = 0; i < stackCards.length; i++){
         var c = stackCards[i], t = c.querySelector('.ttl');
-        if (t){ tOff[i] = t.offsetTop; tH[i] = t.offsetHeight; }
+        if (t){ tOff[i] = offsetFromCard(t, c); tH[i] = t.offsetHeight; }
         else { tOff[i] = 0; tH[i] = 0; }
       }
     }
