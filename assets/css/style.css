@@ -325,13 +325,15 @@ footer .f-links a:hover{color:var(--accent)}
   .hero-sub{font-size:16px;margin-top:24px}
   .hero-ctas{gap:12px;flex-direction:column;align-items:center}
 
-  /* SERVICI: deck di card con sovrapposizione pulita, senza tagli né sbordi */
-  .stack{padding:10px 0 130px}
-  .card{height:max(74svh,460px);min-height:0;padding:34px 8vw 30px;margin-bottom:-14vh;width:94vw;border-radius:2.6rem}
+  /* SERVICI: deck stretto e profondo — le card si accavallano quasi per intero,
+     la frontale (ultima) domina; niente slivere rotto tra seconda e terza */
+  .stack{padding:10px 0 40vh}
+  .card{height:70svh;min-height:0;padding:34px 8vw 30px;width:94vw;border-radius:2.2rem;margin-bottom:-48svh;will-change:transform}
   .card .ttl small{display:none}
   .card .ttl{font-size:clamp(30px,10vw,50px);max-width:100%;overflow-wrap:break-word;padding-right:6px}
   .card .mid{flex-direction:column;align-items:flex-start;justify-content:flex-start}
   .card .glb{position:absolute;right:7%;bottom:34px;transform:none;width:min(74%,250px);aspect-ratio:1;margin:0}
+  .card:last-child{margin-bottom:0}
 
   /* TITOLI sezione: stesso padding sx + letter-spacing coerente (allineati) */
   .sec-head.max-wide,.case-head,.blog-head{padding-left:24px;padding-right:24px}
