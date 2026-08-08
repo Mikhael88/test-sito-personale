@@ -328,18 +328,19 @@ footer .f-links a:hover{color:var(--accent)}
   .hero-sub{font-size:16px;margin-top:24px}
   .hero-ctas{gap:12px;flex-direction:column;align-items:center}
 
-  /* SERVICI — VENTAGLIO MOBILE: tre card sequenziali, testo sempre leggibile;
-     la 3a (lavanda) NON copre la 1a e 2a — resta sempre lo spazio col titolo.
-     Scorrendo salgono tutte insieme (nessuno sticky/peel). */
-  .stack{padding:0}
+  /* SERVICI — STACK BLOCCATO: copertura sticky che si FERMA a top diversi;
+     card1 e card2 restano parzialmente scoperte in alto (striscia col titolo
+     sempre leggibile), card3 lavanda è la frontale grande. Il ventaglio resta
+     bloccato mentre scorri, poi salgono tutte insieme. */
+  .stack{padding:0 0 14vh}
   .card{position:relative;width:100%;border-radius:0;margin:0;box-shadow:none;overflow:hidden;
-    display:flex;flex-direction:column;justify-content:flex-start;padding:22px 9vw 20px;min-height:0}
-  .card:first-child{height:22svh;background:var(--card-1-bg);color:var(--card-1-fg)}
-  .card:nth-child(2){height:22svh;background:var(--card-2-bg);color:var(--card-2-fg)}
-  .card:last-child{height:56svh;background:var(--card-3-bg);color:var(--card-3-fg);padding-bottom:34px}
+    display:flex;flex-direction:column;justify-content:flex-start;padding:26px 9vw 30px;min-height:0}
+  .card:first-child{position:sticky;top:56px;height:68svh;background:var(--card-1-bg);color:var(--card-1-fg)}
+  .card:nth-child(2){position:sticky;top:206px;height:68svh;background:var(--card-2-bg);color:var(--card-2-fg)}
+  .card:last-child{position:sticky;top:356px;height:68svh;background:var(--card-3-bg);color:var(--card-3-fg);padding-bottom:34px}
   .card .top{display:flex;justify-content:space-between;align-items:center}
   .card .num{font-size:clamp(24px,5vw,40px);opacity:.28}
-  .card .ttl{font-size:clamp(28px,9vw,44px);max-width:100%;overflow-wrap:break-word;padding-right:6px;margin-top:12px}
+  .card .ttl{font-size:clamp(26px,8vw,42px);max-width:100%;overflow-wrap:break-word;padding-right:6px;margin-top:12px}
   .card .ttl small{display:none}
   .card .mid{position:static;flex:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}
   .card .glb{display:none}
