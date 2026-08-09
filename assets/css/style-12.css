@@ -231,8 +231,6 @@ h1.hero-title{font-family:var(--font-display);font-weight:600;line-height:.98;le
 .appr .step .n{font-family:var(--font-display);font-size:16px;color:var(--accent);letter-spacing:.04em}
 .appr .step h3{font-family:var(--font-display);font-weight:600;font-size:28px;margin:18px 0 14px}
 .appr .step p{color:var(--t-muted);font-size:15px}
-.appr .step .bar{position:absolute;bottom:0;left:0;height:4px;background:var(--accent);width:0;transition:width 1.2s var(--ease)}
-.appr .step.in .bar{width:100%}
 
 /* ---------- APPROACH: confronto classico vs file 3D ---------- */
 .appr-compare{margin:70px auto 0;max-width:1280px}
@@ -252,7 +250,6 @@ h1.hero-title{font-family:var(--font-display);font-weight:600;line-height:.98;le
 .ac-col.digital ul li::before{border-color:var(--accent)}
 .ac-col.digital ul li{color:var(--t-bright)}
 .ac-col.digital{background:linear-gradient(180deg,rgba(var(--accent-rgb),.10),var(--surface) 60%);border-color:rgba(var(--accent-rgb),.35)}
-.ac-col.digital::after{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent);border-radius:var(--r-l) var(--r-l) 0 0}
 .ac-col .ac-note{margin-top:22px;font-size:14px;color:var(--t-muted)}
 .ac-col.digital .ac-note{color:var(--t-bright)}
 .ac-col.digital .ac-note b{color:var(--accent)}
