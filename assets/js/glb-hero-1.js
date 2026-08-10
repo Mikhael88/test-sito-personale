@@ -66,8 +66,11 @@
     });
   });
 
-  /* orbita ellittica: raggio x largo, raggio z stretto (profondità) */
-  var RX = 4.9, RZ = 2.3, CY = -0.15, SPEED = 0.32;
+  /* orbita ellittica INCLINATA: il piano ruota attorno all'asse X.
+     Davanti (z max) -> il modello scende sotto il testo (impalla poco)
+     Dietro  (z min) -> il modello sale sopra il testo (visibile, non coperto)
+     Ai lati resta fuori dal blocco di testo. */
+  var RX = 5.2, RZ = 2.8, CY = 0.45, RY = 2.0, SPEED = 0.32;
 
   function resize(){
     var w = hero.clientWidth, h = hero.clientHeight;
@@ -92,16 +95,28 @@
       var a = it.angle + t * SPEED;
       var x = Math.sin(a) * RX;
       var z = Math.cos(a) * RZ;
-      var depth = (z + RZ) / (2 * RZ);      // 0 = dietro, 1 = davanti
-      var s = 0.72 + depth * 0.55;          // piccolo dietro, grande davanti
-      it.wrap.position.set(x, CY, z);
+      var y = CY - Math.cos(a) * RY;    // davanti(cos=1)=basso, dietro(cos=-1)=alto
+      var depth = (z + RZ) / (2 * RZ);  // 0 = dietro, 1 = davanti
+      var s = 0.66 + depth * 0.60;      // piccolo dietro, grande davanti
+      it.wrap.position.set(x, y, z);
       it.wrap.scale.setScalar(s);
-      it.wrap.rotation.y = a;               // il modello segue l'orbita
-      it.mesh.rotation.y += dt * it.spin;   // plus rotazione propria
+      it.wrap.rotation.y = a;           // il modello segue l'orbita
+      it.mesh.rotation.y += dt * it.spin; // plus rotazione propria
       it.mesh.visible = true;
     });
 
     renderer.render(scene, camera);
   }
   requestAnimationFrame(loop);
+
+  /* hook debug: espone le posizioni correnti dei tre modelli (utile per messa a punto) */
+  window.__hero3d = {
+    dump: function(){
+      return items.map(function(it){
+        if (!it || !it.ready) return 'loading';
+        var p = it.wrap.position, s = it.wrap.scale.x;
+        return 'x='+p.x.toFixed(2)+' y='+p.y.toFixed(2)+' z='+p.z.toFixed(2)+' scale='+s.toFixed(2);
+      });
+    }
+  };
 })();
