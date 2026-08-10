@@ -20,7 +20,7 @@
     t.innerHTML = h;
   }
   var m1 = document.getElementById('m1');
-  if (m1) fillMarquee('m1', ['Configuratori 3D','Video & animazioni tecniche','Ricostruzione 3D','Fotogrammetria','Gaussian Splatting','Rendering prodotto']);
+  if (m1) fillMarquee('m1', ['Configuratori 3D','Video & animazioni tecniche','AI applicata','Fotogrammetria','Gaussian Splatting','Rendering prodotto']);
   fillMarquee('m2', ['Scopri i servizi','Configuratori 3D','Digitalizzazione prodotto','Nord Italia — manifattura']);
 
   /* case carousel: fill + velocity-linked loop (solo se presente) */

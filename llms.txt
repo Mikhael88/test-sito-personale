@@ -1,14 +1,15 @@
 # Faccoli · Digitalizzazione Prodotto
 
-> Consulente per la digitalizzazione del prodotto manifatturiero. Dal fisico al digitale: configuratori 3D, video tecnici, scansione 3D, fotogrammetria e Gaussian Splatting. Brescia, Nord Italia.
+> Consulente per la digitalizzazione del prodotto manifatturiero. Dal fisico al digitale: configuratori 3D, video tecnici, AI applicata, scansione 3D, fotogrammetria e Gaussian Splatting. Brescia, Nord Italia.
 
 ## Chi sono
-Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le aziende manifatturiere a portare il loro prodotto dal fisico al digitale: configuratori 3D realtime, simulazioni, render tecniche, acquisizione 3D da campione reale.
+Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le aziende manifatturiere a portare il loro prodotto dal fisico al digitale: configuratori 3D realtime, simulazioni, render tecniche, acquisizione 3D da campione reale, orientamento e sviluppo AI su misura.
 
 ## Cosa offro
 - Configuratori 3D realtime (web, embedded nel sito)
 - Video & animazioni tecniche (simulazioni di flusso, movimenti meccanici)
-- Ricostruzione 3D: scansione 3D da oggetto fisico, fotogrammetria (drone e macchina fotografica), Gaussian Splatting
+- AI applicata: orientamento sugli strumenti AI, analisi delle necessità, sviluppo ad hoc
+- Ricostruzione 3D (capability trasversale): scansione 3D da oggetto fisico, fotogrammetria (drone e macchina fotografica), Gaussian Splatting
 
 ## Dati chiave
 - 15+ anni di esperienza
@@ -25,6 +26,7 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 - [Servizi](https://www.faccioli.it/servizi.html)
 - [Configuratori 3D](https://www.faccioli.it/servizio/configuratori-3d.html)
 - [Video & animazioni tecniche](https://www.faccioli.it/servizio/video-animazioni-tecniche.html)
+- [AI applicata](https://www.faccioli.it/servizio/ai-applicata.html)
 - [Ricostruzione 3D](https://www.faccioli.it/servizio/ricostruzione-3d.html)
 - [Case history](https://www.faccioli.it/case-history.html)
 - [Blog](https://www.faccioli.it/blog.html)
