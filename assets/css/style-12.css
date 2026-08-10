@@ -80,17 +80,11 @@ h2.sec-title{font-family:var(--font-display);font-weight:600;font-size:clamp(36p
 
 /* ---------- HERO home ---------- */
 .hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:140px 0 60px;overflow:hidden}
-.float{position:absolute;z-index:0;border-radius:var(--r-m);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);will-change:transform;cursor:grab;transition:box-shadow .4s,outline-color .4s;outline:2px solid transparent;touch-action:pan-y;user-select:none;-webkit-user-select:none}
-.float img{width:100%;height:100%;object-fit:cover;pointer-events:none;will-change:transform}
-.float .tag{position:absolute;left:14px;bottom:12px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.45);padding:5px 12px;border-radius:999px;backdrop-filter:blur(6px);font-weight:500;pointer-events:none}
+.hero3d{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;display:block}
 @media(hover:hover){
-  .hero:hover .float:not(:hover):not(.dragging){opacity:.35;filter:blur(2px) saturate(.8)}
-  .float:hover{outline-color:rgba(var(--accent-rgb),.7);box-shadow:0 30px 90px rgba(var(--accent-rgb),.25);z-index:5}
+  .hero .hero3d{opacity:.92}
+  .hero:hover .hero3d{opacity:1}
 }
-.float.dragging{cursor:grabbing;z-index:6;outline-color:var(--accent);box-shadow:0 40px 110px rgba(var(--accent-rgb),.35)}
-.f1{width:220px;height:260px;top:20%;left:6%}
-.f2{width:180px;height:220px;top:15%;right:8%}
-.f3{width:200px;height:250px;bottom:10%;left:6%}
 .hero-inner{position:relative;z-index:2;text-align:center;max-width:1000px;margin:0 auto}
 .hero-inner .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--t-muted);border:1px solid var(--border);border-radius:999px;padding:8px 18px;margin-bottom:34px}
 .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2.4s infinite}
@@ -362,7 +356,7 @@ footer .f-links a:hover{color:var(--accent)}
   .appr{grid-template-columns:1fr}
   .appr-cols{grid-template-columns:1fr}
   .ac-col{padding:28px 24px}
-  .float{display:none}
+  .hero3d{display:none}
   .page-hero{padding:140px 24px 50px}
   .blog-list{padding:0 24px 80px}
   .bpost{flex-direction:column;gap:20px}
@@ -376,7 +370,7 @@ footer .f-links a:hover{color:var(--accent)}
   .cta-sec{padding:70px 24px calc(70px + env(safe-area-inset-bottom))}
 }
 @media(prefers-reduced-motion:reduce){
-  .marquee-track,.hero-title .word,.float,.scroll-cue,.eyebrow .dot{animation:none!important;transition:none!important;transform:none!important;opacity:1!important}
+  .marquee-track,.hero-title .word,.scroll-cue,.eyebrow .dot{animation:none!important;transition:none!important;transform:none!important;opacity:1!important}
 }
 
 /* ---------- ACCESSIBILITÀ: focus visibile (tutte le pagine) ---------- */

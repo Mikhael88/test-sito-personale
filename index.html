@@ -66,9 +66,7 @@
 </nav>
 
 <header class="hero">
-  <div class="float f1"><img src="assets/img/hero-configuratore.webp" alt="Configuratore 3D"><span class="tag">Configuratore 3D</span></div>
-  <div class="float f2"><img src="assets/img/hero-animazione.webp" alt="Animazione tecnica"><span class="tag">Animazione</span></div>
-  <div class="float f3"><img src="assets/img/card-ai.webp" alt="AI applicata: orientamento e sviluppo"><span class="tag">AI applicata</span></div>
+  <canvas id="hero3d" class="hero3d" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
     <span class="eyebrow"><span class="dot"></span> Consulente Digitalizzazione Prodotto · Brescia</span>
@@ -268,5 +266,8 @@
 </footer>
 
 <script src="assets/js/main-11.js"></script>
+<script src="assets/js/vendor/three.min.js"></script>
+<script src="assets/js/vendor/GLTFLoader.js"></script>
+<script src="assets/js/glb-hero-1.js"></script>
 </body>
 </html>

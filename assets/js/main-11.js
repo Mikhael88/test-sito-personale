@@ -66,36 +66,6 @@
     requestAnimationFrame(caseLoop);
   }
 
-  /* hero floats: idle + drag-to-rotate + parallax (solo se presenti) */
-  var floats = document.querySelectorAll('.float');
-  if (floats.length) {
-    floats.forEach(function(f){
-      f._rx = 0; f._ry = 0; f._drag = false;
-      var img = f.querySelector('img');
-      f.addEventListener('pointerdown', function(e){
-        f._drag = true; f.classList.add('dragging'); f.setPointerCapture(e.pointerId);
-        f._sx = e.clientX; f._sy = e.clientY; e.preventDefault();
-      });
-      f.addEventListener('pointermove', function(e){
-        if (!f._drag) return;
-        f._ry = (f._ry || 0) + (e.clientX - f._sx) * 0.6;
-        f._rx = (f._rx || 0) - (e.clientY - f._sy) * 0.6;
-        f._sx = e.clientX; f._sy = e.clientY;
-        if (img) img.style.transform = 'perspective(800px) rotateY('+f._ry+'deg) rotateX('+f._rx+'deg)';
-      });
-      function endDrag(){ f._drag = false; f.classList.remove('dragging'); }
-      f.addEventListener('pointerup', endDrag);
-      f.addEventListener('pointercancel', endDrag);
-    });
-    var t0 = 0;
-    function loop(ts){
-      var y = (ts - t0) / 1000;
-      floats.forEach(function(f, i){ var ph = Math.sin(y * 1.2 + i * 2.1) * 14; f.style.transform = 'translateY('+ph+'px)'; });
-      requestAnimationFrame(loop);
-    }
-    requestAnimationFrame(loop);
-  }
-
   /* hero title animation */
   var ht = document.getElementById('ht');
   if (ht) setTimeout(function(){ ht.classList.add('done'); }, 300);
@@ -127,12 +97,4 @@
     var to = +el.dataset.to, cur = 0, step = Math.max(1, Math.round(to / 50));
     var iv = setInterval(function(){ cur += step; if (cur >= to) { cur = to; clearInterval(iv); } el.textContent = cur; }, 26);
   }
-
-  /* parallax floats on scroll */
-  window.addEventListener('scroll', function(){
-    var y = window.scrollY;
-    if (floats.length && y < window.innerHeight * 1.2){
-      floats.forEach(function(f, i){ var off = y * (0.04 + i * 0.02); f.style.marginTop = off + 'px'; });
-    }
-  }, {passive:true});
 })();
