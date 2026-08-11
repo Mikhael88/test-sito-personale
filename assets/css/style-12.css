@@ -42,7 +42,7 @@ img{display:block;max-width:100%}
 ::selection{background:var(--accent);color:#111}
 
 /* ---------- NAV ---------- */
-.nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;mix-blend-mode:difference}
+.nav{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:18px 40px;background:color-mix(in srgb,var(--base) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
 .brand{font-family:var(--font-display);font-weight:600;font-size:19px;letter-spacing:-.02em}
 .brand b{color:var(--accent)}
 .nav-links{display:flex;gap:30px;font-size:14px;color:var(--t-muted)}
