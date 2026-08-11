@@ -7,7 +7,7 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 
 ## Cosa offro
 - Configuratori 3D realtime (web, embedded nel sito)
-- Video & animazioni tecniche (simulazioni di flusso, movimenti meccanici)
+- Render e Animazioni (viste tecniche, simulazioni di flusso, animazioni meccaniche)
 - AI applicata: orientamento sugli strumenti AI, analisi delle necessità, sviluppo ad hoc
 - Ricostruzione 3D (capability trasversale): scansione 3D da oggetto fisico, fotogrammetria (drone e macchina fotografica), Gaussian Splatting
 
@@ -15,7 +15,7 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 - 15+ anni di esperienza
 - 30+ progetti di digitalizzazione
 - 6 configuratori 3D web live
-- Clienti: Altrenotti, Marmogranito, DND Martinelli, Rizzoli, Unitec, Sunshading, Silverplat, Robosan
+- Clienti: Altrenotti, Marmogranito, DND Martinelli, Rizzoli, Sunshading, Silverplat, Robosan, Alcofer, Cosmo, Tredo, Prussiani Engineering, Intimissimi, Olfice, Maxema, Heltyair, Limago
 
 ## Contatti
 - Email: ciao@faccioli.it
@@ -25,7 +25,7 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 - [Homepage](https://www.faccioli.it/)
 - [Servizi](https://www.faccioli.it/servizi.html)
 - [Configuratori 3D](https://www.faccioli.it/servizio/configuratori-3d.html)
-- [Video & animazioni tecniche](https://www.faccioli.it/servizio/video-animazioni-tecniche.html)
+- [Render e Animazioni](https://www.faccioli.it/servizio/video-animazioni-tecniche.html)
 - [AI applicata](https://www.faccioli.it/servizio/ai-applicata.html)
 - [Ricostruzione 3D](https://www.faccioli.it/servizio/ricostruzione-3d.html)
 - [Case history](https://www.faccioli.it/case-history.html)

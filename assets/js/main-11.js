@@ -20,21 +20,25 @@
     t.innerHTML = h;
   }
   var m1 = document.getElementById('m1');
-  if (m1) fillMarquee('m1', ['Configuratori 3D','Video & animazioni tecniche','AI applicata','Fotogrammetria','Gaussian Splatting','Rendering prodotto']);
-  fillMarquee('m2', ['Scopri i servizi','Configuratori 3D','Digitalizzazione prodotto','Nord Italia — manifattura']);
+  if (m1) fillMarquee('m1', ['Configuratori 3D','Render & Animazioni','AI applicata','Fotogrammetria','Gaussian Splatting','Rendering prodotto']);
+
+  /* clienti: marquee scorrevole (stessa riga servizi) */
+  var CLI = ['Altrenotti','Marmogranito','DND','Rizzoli','Sunshading','Silverplat','Robosan','Alcofer','Cosmo','Tredo','Prussiani Engineering','Intimissimi','Olfice','Maxema','Heltyair','Limago'];
+  var cli = document.getElementById('mc');
+  if (cli) fillMarquee('mc', CLI);
 
   /* case carousel: fill + velocity-linked loop (solo se presente) */
   var CASES = [
-    {type:'color', name:'Altrenotti', tag:'Configuratore 3D · 1B+ varianti', cls:'cc-lime'},
-    {type:'photo', name:'Altrenotti', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp'},
-    {type:'color', name:'Marmogranito', tag:'Primo configuratore parametrico in Italia', cls:'cc-lav'},
-    {type:'photo', name:'Marmogranito', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp'},
-    {type:'color', name:'DND Martinelli', tag:'20K+ immagini coerenti', cls:'cc-surface'},
-    {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp'}
+    {type:'color', name:'Altrenotti', tag:'Configuratore 3D · 1B+ varianti', cls:'cc-lime', href:'case-study/altrenotti.html'},
+    {type:'photo', name:'Altrenotti', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp', href:'case-study/altrenotti.html'},
+    {type:'color', name:'Marmogranito', tag:'Primo configuratore parametrico in Italia', cls:'cc-lav', href:'case-study/marmogranito.html'},
+    {type:'photo', name:'Marmogranito', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/marmogranito.html'},
+    {type:'color', name:'DND Martinelli', tag:'20K+ immagini coerenti', cls:'cc-surface', href:'case-study/dnd-martinelli.html'},
+    {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/dnd-martinelli.html'}
   ];
   function caseCard(c){
-    if (c.type === 'color') return '<div class="case-card color '+c.cls+'"><div class="c-tag">'+c.tag+'</div><div class="c-name">'+c.name+'</div></div>';
-    return '<div class="case-card photo"><img src="'+c.img+'" alt="'+c.name+'"><div class="c-name">'+c.name+'</div></div>';
+    if (c.type === 'color') return '<a class="case-card color '+c.cls+'" href="'+c.href+'"><div class="c-tag">'+c.tag+'</div><div class="c-name">'+c.name+'</div></a>';
+    return '<a class="case-card photo" href="'+c.href+'"><img src="'+c.img+'" alt="'+c.name+'"><div class="c-name">'+c.name+'</div></a>';
   }
   function fillCase(id, items){
     var t = document.getElementById(id); if (!t) return 0;
