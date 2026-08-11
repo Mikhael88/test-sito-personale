@@ -22,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Genera pagine da content/ (generatore statico)
+        run: |
+          python build.py
+          rm -rf content   # i sorgenti .md non devono finire online
       - name: Upload sito statico
         uses: actions/upload-pages-artifact@v3
         with:

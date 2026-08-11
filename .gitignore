@@ -1,5 +1,6 @@
 # File di servizio / non pubblicabili — esclusi dal sito statico
 *.py
+!build.py
 REPORT-*.md
 .bak/
 _archive/

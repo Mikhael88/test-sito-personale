@@ -1,84 +1,101 @@
 # Guida Contenuti — Come aggiungere Blog e Case History
 
-> Sito statico su GitHub Pages. Nessun CMS obbligatorio: i contenuti sono **file**.
-> Questa guida spiega il flusso attuale (manuale, sicuro) e la strada futura (CMS).
+> Sito statico su GitHub Pages. Nessun CMS: i contenuti sono **file Markdown**.
+> Un **generatore** (`build.py`) li trasforma in pagine HTML col template esistente.
+> Questa guida è il flusso ufficiale: leggi, poi copia un template e scrivi.
 
 ---
 
-## 📌 Come funziona ora
+## 🧠 Come funziona (flusso attivo)
 
-Il sito è HTML statico puro. Ogni pagina è un file `.html` che **riusa i template** già pronti:
-- Articolo blog → template in `blog/` (es. `blog/dall-idea-al-configuratore.html` è il modello)
-- Case history → template in `case-study/` (es. `case-study/altrenotti.html` è il modello)
+```
+content/blog/<slug>.md        ← scrivi QUI in Markdown (front-matter + corpo)
+content/case-study/<slug>.md  ← idem per le case history
+        │
+        ▼  python build.py   (automatico in GitHub Actions a ogni push)
+        │
+   blog/<slug>.html          ← reso col TEMPLATE esistente (estetica IDENTICA)
+   case-study/<slug>.md → case-study/<slug>.html
+        │
+        ▼  aggiorna anche blog.html / case-history.html (liste, tra i marker)
+```
 
-**Aggiungere un POST blog (2 passi):**
-
-1. **Copia il template** di un post esistente in un nuovo file:
-   ```
-   blog/dall-idea-al-configuratore.html  →  blog/nuovo-articolo.html
-   ```
-2. **Modifica in `blog/nuovo-articolo.html`**:
-   - `<title>` e `<meta description>` (SEO)
-   - La sezione `<header class="page-hero">`: `<div class="a-meta">` (tag + data) e `<h1>` (titolo)
-   - Il contenuto dentro `<article class="article">` (paragrafi, h2, liste, blockquote)
-   - Il blocco `a-cta` (invito finale)
-   - I link `<div class="a-prevnext">` (collega avanti/indietro)
-3. **Aggiungi la card del nuovo post** in `blog.html` (copia una riga `bpost` esistente e cambia href/titolo/immagine/data) e, volendo, nella homepage (`index.html`, sezione Insights).
-
-**Aggiungere una CASE HISTORY (stesso flusso):**
-1. Copia `case-study/*.html` → nuovo file
-2. Modifica contenuti come sopra
-3. Aggiungi la tile in `case-history.html` (e nel carousel della homepage `index.html` se vuoi mostrarla)
-
-**Ogni modifica richiede:** commit + push → GitHub Actions rigenera il sito (~1 minuto).
+**Perché così eviti le allucinazioni nel codice:** scrivi il contenuto in Markdown;
+la resa HTML è sempre identica perché fatta dal template. Non si tocca mai l'HTML
+a mano per aggiungere contenuti → niente rischio di rompere il design.
 
 ---
 
-## 🧠 La soluzione custom consigliata per il futuro (generatore + CMS)
+## ✍️ Aggiungere un POST o una CASE HISTORY (3 passi)
 
-Per rendere l'aggiunta contenuti **zero-sforzo e a prova di design**, la strada che consiglio è un **mini generatore statico** su misura:
+1. **Copia il template**:
+   - Post: `content/blog/_TEMPLATE-post.md` → `content/blog/il-tuo-slug.md`
+   - Caso: `content/case-study/_TEMPLATE-caso.md` → `content/case-study/il-tuo-slug.md`
+   I file che iniziano con `_` sono **ignorati** dal generatore (mai pubblicati).
 
-### Architettura proposta
-```
-content/
-  blog/nuovo-articolo.md      ← scrivi QUI in Markdown (titolo, tag, data, corpo)
-  case-study/nuovo-caso.md    ← idem per le case history
-generator/build.py            ← piccolo script: .md + template → .html
-assets/...                    ← CSS/JS invariati (l'estetica resta identica)
-```
+2. **Compila il front-matter** (obbligatorio):
+   ```markdown
+   ---
+   title: "Il titolo del post"
+   slug: il-tuo-slug          # nome dell'URL (pulito, breve)
+   date: 2026-08-11           # YYYY-MM-DD
+   tags: [Configuratori, 3D]
+   image: ../assets/img/card-XYZ.webp   # path dalla root del sito
+   excerpt: "Descrizione breve (card + meta SEO)."
+   ---
+   ```
+   Poi scrivi il corpo in **Markdown semplice**, supportato:
+   `## h2`, `### h3`, `- liste`, `> blockquote`, `**grassetto**`, `[link](url)`.
+   Niente altro (niente tabelle/code fence: il generatore non li rende).
 
-**Come funziona:**
-- Scrivi un post in `content/blog/x.md` con un semplice front-matter:
-  ```markdown
-  ---
-  title: "Il mio nuovo articolo"
-  date: 2026-08-08
-  tags: [Configuratori, 3D]
-  image: /img/articolo.webp
-  excerpt: "Sottotitolo che appare nella lista."
-  ---
-  Il contenuto dell'articolo in Markdown...
-  ```
-- Il generatore (`build.py`) trasforma il `.md` in una pagina HTML **usando il template esistente** → stessa impaginazione, stessi stili, zero rischio di rompere il design.
-- Il generatore aggiorna automaticamente anche le **liste** (`blog.html`, `case-history.html`, homepage).
-- Basta aggiungere il file `.md` + push → GitHub Actions lancia `build.py` → sito aggiornato.
+3. **Push** → GitHub Actions lancia `build.py` → pagina generata + liste
+   aggiornate + deploy (~1 minuto). Poi **verifica l'URL live**.
 
-### Opzioni CMS (da decidere più avanti)
+### Regole
+- **Immagine**: sposta/ottimizza prima il file in `assets/img/` (webp, leggero).
+- **Slug**: mettilo SEMPRE nel front-matter (se manca si genera dal titolo, ma
+  viene lungo e sporco).
+- **Non toccare a mano** `blog/<slug>.html` generato: alla prossima build
+  viene sovrascritto dal `.md`.
+- I file `/content/` non finiscono online: il workflow li rimuove prima del deploy.
+
+---
+
+## 🔧 Il generatore (`build.py`)
+
+- Solo **stdlib Python** (niente pip) → gira gratis in GitHub Actions.
+- `python build.py` — rigenera pagine + liste.
+- `python build.py --check` — verifica senza scrivere nulla.
+- Templates HTML: hardcoded 1:1 con le pagine esistenti (head, nav, footer,
+  `a-cta`, script `main-11.js`). Se un domani cambi il design del sito,
+  aggiorna `HEAD`/`NAV`/`FOOTER` in `build.py`.
+- Liste: le card vivono tra i marker
+  `<!-- BLOG-CARDS:START --> ... <!-- BLOG-CARDS:END -->` (e `CASE-CARDS`)
+  in `blog.html` / `case-history.html`: la build sostituisce solo quel blocco,
+  il resto della pagina (hero, CTA, footer) non viene toccato.
+
+---
+
+## 🗺️ Strada futura (solo se serve)
+
 | Soluzione | Pro | Contro |
 |---|---|---|
-| **Generatore custom (consigliata)** | Nessuna dipendenza, estetica identica, editabile anche da telefono via GitHub | Serve build, no UI di editing |
-| **Decap CMS (ex Netlify)** | UI web di editing gratis, si connette al repo, salva Markdown | Va integrato col generatore; un po' di setup |
+| **Generatore custom (ATTIVO)** | Nessuna dipendenza, estetica identica, editabile anche da telefono via GitHub | Serve build, no UI di editing |
+| **Decap CMS (ex Netlify)** | UI web di editing gratis, salva gli stessi `.md` | Va integrato; il generatore resta identico |
 | **Strapi/Headless completo** | Potente, multi-utente | Server o cloud, overkill per questo sito |
 
-**La mia raccomandazione:** partire col **generatore custom in Python** (leggero, ~1 file) e, se in futuro vuoi un pannello di editing, agganciarci **Decap CMS** che scrive gli stessi `.md` — il generatore resta identico.
+**Raccomandazione:** restare col generatore custom. Se in futuro vuoi un pannello
+di editing, aggancia **Decap CMS** che scrive gli stessi `.md` — il generatore
+non cambia di una riga.
 
 ---
 
-## ✅ Checklist per il primo lancio
+## ✅ Checklist stato sito
 - [x] Nav con Home + logo clickable (tutte le pagine)
-- [x] Card servizi a 3 (bianco/verde/lavanda, stack slide)
-- [x] 13 pagine: homepage, servizi, case-history + 4, blog + 4, contatti
+- [x] Card servizi a 3 (stack slide)
+- [x] 17 pagine: homepage, servizi, case-history, blog, contatti, 4 servizi, 4 blog, 4 casi
 - [x] SEO/OG/JSON-LD + llms.txt
 - [x] GitHub Pages live
+- [x] Generatore contenuti attivo (`build.py` + `content/` + Actions)
 - [ ] Decidere dominio (placeholder: faccioli.it)
 - [ ] Sostituire immagini demo con asset propri
