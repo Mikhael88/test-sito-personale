@@ -6,6 +6,38 @@
 
 ---
 
+## ✏️ Modificare i testi del sito (CMS a file)
+
+| File | Cosa contiene |
+|---|---|
+| `content/testi/index.md` | **TUTTI i testi della homepage** (hero, servizi, approccio, CTA…) |
+| `content/blog/<slug>.md` | Post del blog |
+| `content/case-study/<slug>.md` | Case history |
+
+**Flusso**: apri `content/testi/index.md` in Cursor/VS Code → cambia la frase a destra di `=` → salva → push (o `python build.py`). Il sito si aggiorna col design **identico**: l'HTML viene rigenerato dal template, nessun rischio di rompere il layout.
+
+Esempio — prima:
+```
+hero.sub = Configuratori 3D realtime, animazioni tecniche...
+```
+dopo:
+```
+hero.sub = La tua nuova frase, con la tua voce. Oppure il tuo prodotto, in vendita online.
+```
+
+### Regole di scrittura (sintassi)
+- `**x**` = grassetto · `*x*` = corsivo · `⏎` = andata a capo (es. nel titolo CTA)
+- `hero.titolo`: le 4 righe separate da `|`; `**parola**` = evidenza lime, `~parola~` = tratto leggero
+- `servizio.N.tags`: valori separati da `·` (ognuno diventa una pillola)
+- `ac.classico.lista` / `ac.digitale.lista`: elementi separati da `⏎` (ognuno un punto elenco)
+- **Non rinominare mai la chiave** (la parte prima di `=`) — è il collegamento col template
+- I testi con `<small>` (descrizioni servizi) e `aria-label` sono collegati: aggiornali insieme al titolo
+
+### Se vuoi più pagine editabili
+`estraggi_testi.py` (locale) estrae una pagina → crea `template/<pagina>.template.html` + `content/testi/<pagina>.md`. Poi `build.py` la rende da lì. Attualmente è estratta solo la homepage (`index`).
+
+---
+
 ## 🧠 Come funziona (flusso attivo)
 
 ```
