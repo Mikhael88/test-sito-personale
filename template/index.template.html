@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Consulente Digitalizzazione Prodotto | Configuratori 3D — Brescia</title>
-<meta name="description" content="Consulente per la digitalizzazione di prodotto nella manifattura del Nord Italia. Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata. Dal fisico al digitale.">
+<title>{{meta.title}}</title>
+<meta name="description" content="{{meta.description}}">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://www.faccioli.it/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -69,17 +69,12 @@
   <canvas id="hero3d" class="hero3d" aria-hidden="true"></canvas>
 
   <div class="hero-inner">
-    <span class="eyebrow"><span class="dot"></span> Consulente Digitalizzazione Prodotto · Brescia</span>
-    <h1 class="hero-title" id="ht">
-  <span class="line"><span class="word">Dall'idea</span></span>
-  <span class="line"><span class="word thin">alla</span> <span class="word">vendita:</span></span>
-  <span class="line"><span class="word accent">dal fisico</span></span>
-  <span class="line"><span class="word thin">al</span> <span class="word">digitale.</span></span>
-</h1>
-    <p class="hero-sub">Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata. Il tuo prodotto manifatturiero, pronto a vendere online.</p>
+    <span class="eyebrow"><span class="dot"></span> {{hero.eyebrow}}</span>
+    <h1 class="hero-title" id="ht">{{hero.titolo}}</h1>
+    <p class="hero-sub">{{hero.sub}}</p>
     <div class="hero-ctas">
-      <a class="pill lime" href="servizi.html">Scopri i servizi →</a>
-      <a class="pill ghost" href="case-history.html">Case history</a>
+      <a class="pill lime" href="servizi.html">{{hero.cta1}}</a>
+      <a class="pill ghost" href="case-history.html">{{hero.cta2}}</a>
     </div>
   </div>
 
@@ -91,41 +86,41 @@
 <section class="full-bleed" id="servizi">
   <div class="sec-head rv max-wide">
     <div>
-      <h2 class="sec-title"><span class="s">S</span><span class="s">e</span><span class="s">r</span><span class="s">v</span><span class="s">i</span><span class="s">z</span><span class="s">i</span></h2>
+      <h2 class="sec-title">{{servizi.titolo}}</h2>
     </div>
-    <span class="sec-cta">Il viaggio del tuo prodotto, dal fisico al digitale.</span>
+    <span class="sec-cta">{{servizi.cta}}</span>
   </div>
   <div class="stack">
     <section class="card c-w">
-      <a class="card-link" href="servizio/configuratori-3d.html" aria-label="Configuratori 3D — scopri il servizio"></a>
+      <a class="card-link" href="servizio/configuratori-3d.html" aria-label="{{servizio.1.arialabel}}"></a>
       <div class="top">
-        <div class="tags"><span>Realtime</span><span>Mouse</span></div>
+        <div class="tags">{{servizio.1.tags}}</div>
         <div class="num">/01</div>
       </div>
       <div class="mid">
-        <div class="ttl">Configuratori<small>Il tuo prodotto reale, in tutte le sue varianti: l'utente sceglie materiali, combinazioni e ordina.</small></div>
+        <div class="ttl">{{servizio.1.titolo}}<small>{{servizio.1.desc}}</small></div>
         <div class="glb"><img src="assets/img/card-configuratori.webp" alt=""></div>
       </div>
     </section>
     <section class="card c-g">
-      <a class="card-link" href="servizio/video-animazioni-tecniche.html" aria-label="Render e Animazioni — scopri il servizio"></a>
+      <a class="card-link" href="servizio/video-animazioni-tecniche.html" aria-label="{{servizio.2.arialabel}}"></a>
       <div class="top">
-        <div class="tags"><span>Rendering</span><span>Simulazioni</span></div>
+        <div class="tags">{{servizio.2.tags}}</div>
         <div class="num">/02</div>
       </div>
       <div class="mid">
-        <div class="ttl">Render & animazioni<small>Viste tecniche, simulazioni di flusso, animazioni meccaniche: raccontiamo insieme il tuo prodotto.</small></div>
+        <div class="ttl">{{servizio.2.titolo}}<small>{{servizio.2.desc}}</small></div>
         <div class="glb"><img src="assets/img/card-video.webp" alt=""></div>
       </div>
     </section>
     <section class="card c-l">
-      <a class="card-link" href="servizio/ai-applicata.html" aria-label="AI applicata — scopri il servizio"></a>
+      <a class="card-link" href="servizio/ai-applicata.html" aria-label="{{servizio.3.arialabel}}"></a>
       <div class="top">
-        <div class="tags"><span>Orientamento</span><span>Analisi</span><span>Sviluppo</span></div>
+        <div class="tags">{{servizio.3.tags}}</div>
         <div class="num">/03</div>
       </div>
       <div class="mid">
-        <div class="ttl">AI applicata<small>Capisci quali strumenti AI hanno senso per la tua azienda.</small></div>
+        <div class="ttl">{{servizio.3.titolo}}<small>{{servizio.3.desc}}</small></div>
         <div class="glb"><img src="assets/img/card-ai.webp" alt=""></div>
       </div>
     </section>
@@ -135,9 +130,9 @@
 <section class="case-carousel full-bleed" id="lavori">
   <div class="case-head rv">
     <div>
-      <h2 class="sec-title"><span class="s">P</span><span class="s">r</span><span class="s">o</span><span class="s">g</span><span class="s">e</span><span class="s">t</span><span class="s">t</span><span class="s">i</span></h2>
+      <h2 class="sec-title">{{progetti.titolo}}</h2>
     </div>
-    <a class="sec-cta" href="case-history.html">Tutti i progetti →</a>
+    <a class="sec-cta" href="case-history.html">{{progetti.cta}}</a>
   </div>
   <div class="case-rows">
     <div class="case-row"><div class="case-track" id="case-a"></div></div>
@@ -150,9 +145,9 @@
 
 <section class="blog-sec full-bleed" id="blog">
   <div class="blog-head rv">
-    <h2 class="sec-title"><span class="s">I</span><span class="s">n</span><span class="s">s</span><span class="s">i</span><span class="s">g</span><span class="s">h</span><span class="s">t</span><span class="s">s</span><span class="s">.</span></h2>
-    <p class="blog-sub">Esplora una selezione di articoli su digitalizzazione prodotto, configuratori 3D e nuove frontiere tra fisico e digitale.</p>
-    <a class="blog-all" href="blog.html">Tutti gli articoli →</a>
+    <h2 class="sec-title">{{insights.titolo}}</h2>
+    <p class="blog-sub">{{insights.sub}}</p>
+    <a class="blog-all" href="blog.html">{{insights.cta}}</a>
   </div>
   <div class="bgrid">
     <article class="bcard rv">
@@ -191,49 +186,37 @@
 </section>
 
 <section class="sec" id="metodo">
-  <div class="sec-head rv"><div><h2 class="sec-title"><span class="s">A</span><span class="s">p</span><span class="s">p</span><span class="s">r</span><span class="s">o</span><span class="s">c</span><span class="s">c</span><span class="s">i</span><span class="s">o</span></h2></div></div>
+  <div class="sec-head rv"><div><h2 class="sec-title">{{approccio.titolo}}</h2></div></div>
   <div class="appr">
-    <div class="step rv"><div class="n">01</div><h3>Capire il prodotto</h3><p>Parto dal fisico: fotografia, scansione 3D, CAD, materiali reali.</p></div>
-    <div class="step rv" data-d="1"><div class="n">02</div><h3>Portarlo in digitale</h3><p>Modello 3D, texture, set di luce, pronti per il web o il rendering.</p></div>
-    <div class="step rv" data-d="2"><div class="n">03</div><h3>Farlo vendere</h3><p>Configuratore, animazione o esperienza interattiva che chiude la vendita.</p></div>
+    <div class="step rv"><div class="n">01</div><h3>{{passo.1.titolo}}</h3><p>{{passo.1.desc}}</p></div>
+    <div class="step rv" data-d="1"><div class="n">02</div><h3>{{passo.2.titolo}}</h3><p>{{passo.2.desc}}</p></div>
+    <div class="step rv" data-d="2"><div class="n">03</div><h3>{{passo.3.titolo}}</h3><p>{{passo.3.desc}}</p></div>
   </div>
 
   <div class="appr-compare rv">
-    <h3 class="ac-title">Perché partire dal file 3D <em>sblocca tutto</em></h3>
+    <h3 class="ac-title">{{ac.titolo}}</h3>
     <div class="appr-cols">
       <div class="ac-col classic">
-        <span class="ac-label">Approccio classico</span>
-        <h3>Un percorso, un solo output</h3>
-        <ul>
-          <li>Il prodotto va costruito e fotografato</li>
-          <li>Foto fatte una volta, per un solo uso</li>
-          <li>Se cambia il prodotto, si rifà tutto</li>
-          <li>Render isolati: catalogo, uno per uno</li>
-          <li>Ogni contenuto costa tempo e denaro</li>
-        </ul>
-        <p class="ac-note">Ogni foto o render è un vicolo cieco: non si riusa, non si trasforma.</p>
+        <span class="ac-label">{{ac.classico.label}}</span>
+        <h3>{{ac.classico.titolo}}</h3>
+        <ul>{{ac.classico.lista}}</ul>
+        <p class="ac-note">{{ac.classico.nota}}</p>
       </div>
       <div class="ac-col digital">
-        <span class="ac-label">Partendo dal file 3D</span>
-        <h3>Una chiave, mille contenuti</h3>
-        <ul>
-          <li>Un unico modello, in qualsiasi variante</li>
-          <li>Render, video, configuratore dallo stesso file</li>
-          <li>Il prodotto cambia? Aggiorni una volta sola</li>
-          <li>Contenuti pronti per sito, e-commerce, social</li>
-          <li>L'esposizione del prodotto cresce in modo esponenziale</li>
-        </ul>
-        <p class="ac-note"><b>Il file 3D è la chiave</b> che sblocca la creazione di contenuti: da un modello, tutti gli output.</p>
+        <span class="ac-label">{{ac.digitale.label}}</span>
+        <h3>{{ac.digitale.titolo}}</h3>
+        <ul>{{ac.digitale.lista}}</ul>
+        <p class="ac-note">{{ac.digitale.nota}}</p>
       </div>
     </div>
-    <p class="ac-key">Dal fisico al digitale: <em>un solo file, infinita esposizione.</em></p>
+    <p class="ac-key">{{ac.key}}</p>
   </div>
 </section>
 
 <section class="cta-sec" id="contatti">
-  <h2 class="rv">Non sai da dove <br> <em>cominciare?</em></h2>
-  <p class="sub rv">Una consulenza di orientamento per il tuo prodotto. Nessun impegno, solo il viaggio dal fisico al digitale.</p>
-  <a class="pill lime rv" href="contatti.html">Parliamone →</a>
+  <h2 class="rv">{{cta.titolo}}</h2>
+  <p class="sub rv">{{cta.sub}}</p>
+  <a class="pill lime rv" href="contatti.html">{{cta.pill}}</a>
 </section>
 
 <footer>

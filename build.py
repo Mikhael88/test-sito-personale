@@ -315,11 +315,130 @@ def update_list(list_file: Path, start: str, end: str, cards: str):
 
 
 # ---------------------------------------------------------------------------
+# Renderer testi (CMS a file): template + content/testi/<pagina>.md → pagina HTML
+# ---------------------------------------------------------------------------
+TESTI_DIR = ROOT / "content" / "testi"
+TEMPLATE_DIR = ROOT / "template"
+
+
+def md_inline_rich(text: str) -> str:
+    """markdown inline completo: **b** *i* ~thin~ [a](url), ⏎ → <br>"""
+    text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
+    text = re.sub(r"\*(.+?)\*", r"<em>\1</em>", text)
+    text = re.sub(r"~(.+?)~", r'<span class="word thin">\1</span>', text)
+    text = re.sub(r"\[(.+?)\]\((.+?)\)", r'<a href="\2">\1</a>', text)
+    text = text.replace("⏎", "<br>")
+    return text
+
+
+def split_sec_title(text: str) -> str:
+    """'Servizi' → <span class="s">S</span>... (titolo split lettera-per-lettera)"""
+    return "".join(f'<span class="s">{ch}</span>' for ch in text)
+
+
+def hero_title_html(text: str) -> str:
+    """'A | B | **C** | ~d~' → <h1 id="ht"> con line/word, accent e thin"""
+    lines = text.split("|")
+    html = ['<h1 class="hero-title" id="ht">']
+    for ln in lines:
+        ln = ln.strip()
+        if not ln:
+            continue
+        parts = re.findall(r"\*\*(.+?)\*\*|~(.+?)~|(\S+)", ln)
+        words = []
+        for b, t, w in parts:
+            if b:
+                words.append(f'<span class="word accent">{b}</span>')
+            elif t:
+                words.append(f'<span class="word thin">{t}</span>')
+            else:
+                words.append(f'<span class="word">{w}</span>')
+        html.append(f'  <span class="line">{" ".join(words)}</span>')
+    html.append("</h1>")
+    return "\n".join(html)
+
+
+def render_pagina(pagina: str) -> bool:
+    """Rende <pagina>.html da template/<pagina>.template.html + content/testi/<pagina>.md.
+    Ritorna True se la pagina è stata resa, False se non c'è template (resta com'è)."""
+    tpl = TEMPLATE_DIR / f"{pagina}.template.html"
+    testi_file = TESTI_DIR / f"{pagina}.md"
+    if not tpl.exists() or not testi_file.exists():
+        return False
+
+    testi = {}
+    for line in testi_file.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or line.startswith(">"):
+            continue
+        if "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        testi[k.strip()] = v.strip()
+
+    html = tpl.read_text(encoding="utf-8")
+
+    # Passo 1: liste ({{chiave.lista}} dentro <ul> → <li> multipli)
+    def li_repl(m):
+        chiave = m.group(1)
+        val = testi.get(chiave, "")
+        items = [f"<li>{md_inline_rich(x.strip())}</li>" for x in val.split("⏎") if x.strip()]
+        return f"<ul>\n          " + "\n          ".join(items) + "\n        </ul>"
+
+    html = re.sub(r"<ul>\{\{([a-z0-9_.]+\.lista)\}\}</ul>", li_repl, html)
+
+    # Passo 2: hero titolo
+    if "hero.titolo" in testi:
+        html = re.sub(r"<h1 class=\"hero-title\" id=\"ht\">\{\{hero\.titolo\}\}</h1>",
+                      lambda m: hero_title_html(testi["hero.titolo"]), html)
+        del testi["hero.titolo"]
+
+    # Passo 3: titoli split lettera-per-lettera (sec-title)
+    def sec_repl(m):
+        testo = testi.get(m.group(1), "")
+        return f'<h2 class="sec-title">{split_sec_title(testo)}</h2>'
+
+    html = re.sub(r"<h2 class=\"sec-title\">\{\{([a-z0-9_.]+\.titolo)\}\}</h2>",
+                  sec_repl, html)
+
+    # Passo 3b: tags ({{chiave.tags}} dentro div.tags → <span> multipli)
+    def tags_repl(m):
+        testo = testi.get(m.group(1), "")
+        items = "".join(f"<span>{x.strip()}</span>" for x in testo.split("·") if x.strip())
+        return f'<div class="tags">{items}</div>'
+
+    html = re.sub(r"<div class=\"tags\">\{\{([a-z0-9_.]+\.tags)\}\}</div>",
+                  tags_repl, html)
+
+    # Passo 4: tutto il resto = placeholder → markdown inline
+    def generic_repl(m):
+        chiave = m.group(1)
+        return md_inline_rich(testi.get(chiave, m.group(0)))
+
+    html = re.sub(r"\{\{([a-z0-9_.]+)\}\}", generic_repl, html)
+
+    (ROOT / f"{pagina}.html").write_text(html, encoding="utf-8")
+    print(f"  ✓ {pagina}.html (da template + testi)")
+    return True
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main():
     check_only = "--check" in sys.argv
     generated = []
+
+    # Passo 0: pagine con template + testi (CMS a file). Le pagine senza template
+    # (ancora non estratte) restano com'è nel repo.
+    if check_only:
+        for tpl in TEMPLATE_DIR.glob("*.template.html") if TEMPLATE_DIR.exists() else []:
+            print(f"  [check] {tpl.name} + content/testi/{tpl.stem.split('.')[0]}.md")
+    else:
+        for tpl in TEMPLATE_DIR.glob("*.template.html") if TEMPLATE_DIR.exists() else []:
+            pagina = tpl.name.replace(".template.html", "")
+            if render_pagina(pagina):
+                generated.append(ROOT / f"{pagina}.html")
 
     for kind, out_dir, list_file, start, end in [
         ("blog", BLOG_DIR, ROOT / "blog.html", START_BLOG, END_BLOG),
