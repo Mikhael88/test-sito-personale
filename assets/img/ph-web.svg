@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#DDF160"/>
+<stop offset="1" stop-color="#9F8BE7"/>
+</linearGradient>
+<radialGradient id="r" cx="0.5" cy="0.5" r="0.6">
+<stop offset="0" stop-color="#DDF160" stop-opacity="0.55"/>
+<stop offset="1" stop-color="#DDF160" stop-opacity="0"/>
+</radialGradient>
+</defs>
+<rect width="1280" height="720" fill="#161616"/>
+<circle cx="640" cy="320" r="240" fill="url(#r)"/>
+<rect x="360" y="200" width="560" height="340" rx="24" fill="#1C1C1C"/><rect x="360" y="200" width="560" height="52" rx="24" fill="#262626"/><circle cx="400" cy="226" r="8" fill="#DDF160"/><circle cx="428" cy="226" r="8" fill="#9F8BE7"/><circle cx="456" cy="226" r="8" fill="#2a2a2a"/><rect x="420" y="300" width="440" height="180" rx="14" fill="url(#g)" opacity="0.85"/>
+<rect x="0" y="0" width="1280" height="720" fill="none" stroke="#2a2a2a" stroke-width="1"/>
+<text x="48" y="672" font-family="Funnel Sans, Arial, sans-serif" font-size="26" letter-spacing="6" fill="#838383" text-transform="uppercase">Prodotto online</text>
+<text x="48" y="72" font-family="Funnel Display, Arial, sans-serif" font-size="18" letter-spacing="4" fill="#DDF160" text-transform="uppercase">Faccoli · Placeholder</text>
+</svg>
