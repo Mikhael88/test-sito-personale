@@ -46,7 +46,10 @@
     {type:'color', name:'Marmogranito', tag:'Primo configuratore parametrico in Italia', cls:'cc-lav', href:'case-study/marmogranito.html'},
     {type:'photo', name:'Marmogranito', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/marmogranito.html'},
     {type:'color', name:'DND Martinelli', tag:'20K+ immagini coerenti', cls:'cc-surface', href:'case-study/dnd-martinelli.html'},
-    {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/dnd-martinelli.html'}
+    {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/dnd-martinelli.html'},
+    {type:'color', name:'Robosan', tag:'Animazione + 3D realtime e-commerce', cls:'cc-lime', href:'case-study/robosan.html'},
+    {type:'color', name:'Heltyair', tag:'Configuratore per manutenzione e montaggio', cls:'cc-lav', href:'case-study/heltyair.html'},
+    {type:'color', name:'Bausola 3D', tag:'Landing con 3D e video tecnico', cls:'cc-surface', href:'case-study/bausola-landing.html'}
   ];
   function caseCard(c){
     if (c.type === 'color') return '<a class="case-card color '+c.cls+'" href="'+c.href+'"><div class="c-tag">'+c.tag+'</div><div class="c-name">'+c.name+'</div></a>';
@@ -62,11 +65,54 @@
   if (document.getElementById('case-a')) {
     var scrollVel = 0, lastY = window.scrollY, posA = 0, posB = 0, caseReady = false;
     window.addEventListener('scroll', function(){ var y = window.scrollY; scrollVel = y - lastY; lastY = y; }, {passive:true});
+
+    /* drag con mouse/dito (Pointer Events: funziona touch e desktop).
+       Un drag orizzontale sposta entrambe le righe (direzioni opposte):
+       trascinare a destra fa scorrere la riga A avanti e la B indietro. */
+    var dragCase = null, dragStartX = 0, dragDelta = 0, dragLastX = 0, dragVel = 0;
+    var rows = document.querySelector('.case-rows');
+    if (rows){
+      rows.addEventListener('pointerdown', function(e){
+        dragCase = {id: e.pointerId};
+        dragStartX = dragLastX = e.clientX;
+        dragDelta = 0; dragVel = 0;
+        try { rows.setPointerCapture(e.pointerId); } catch(err){}
+      });
+      rows.addEventListener('pointermove', function(e){
+        if (!dragCase || dragCase.id !== e.pointerId) return;
+        var dx = e.clientX - dragLastX;
+        dragLastX = e.clientX;
+        dragDelta += dx;
+        dragVel = dx;
+        posA += dx; posB -= dx; /* A e B scorrono in direzioni opposte */
+        while (posA <= -setA) posA += setA;
+        while (posB >= 0) posB -= setB;
+        var a = document.getElementById('case-a'); if (a) a.style.transform = 'translateX('+posA+'px)';
+        var b = document.getElementById('case-b'); if (b) b.style.transform = 'translateX('+posB+'px)';
+      });
+      function endDrag(e){
+        if (!dragCase || dragCase.id !== e.pointerId) return;
+        dragCase = null;
+      }
+      rows.addEventListener('pointerup', endDrag);
+      rows.addEventListener('pointercancel', endDrag);
+      rows.addEventListener('pointerleave', endDrag);
+      /* evita che il drag inizi quando si clicca una card (navigazione) */
+      rows.addEventListener('click', function(e){
+        if (Math.abs(dragDelta) > 8){ e.preventDefault(); e.stopPropagation(); }
+      }, true);
+      rows.style.cursor = 'grab';
+      rows.style.touchAction = 'pan-y';
+    }
+
     function caseLoop(){
       if (caseReady && setA && setB){
         scrollVel *= 0.9;
         var base = 0.6, boost = Math.min(Math.abs(scrollVel) * 0.35, 14);
-        posA -= (base + boost); posB += (base + boost);
+        /* inerzia del drag: continua il movimento dopo il rilascio */
+        var inertia = 0;
+        if (!dragCase && Math.abs(dragVel) > 0.1){ inertia = dragVel * 0.35; dragVel *= 0.9; }
+        posA -= (base + boost) + inertia; posB += (base + boost) + inertia;
         while (posA <= -setA) posA += setA;
         while (posB >= 0) posB -= setB;
         var a = document.getElementById('case-a'); if (a) a.style.transform = 'translateX('+posA+'px)';

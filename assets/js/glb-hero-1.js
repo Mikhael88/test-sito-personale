@@ -43,7 +43,7 @@
   /* IMPORTANTE: quando sostituisci i GLB in assets/models/, INCREMENTA questa
      versione (es. '3' -> '4'): forza il browser a scaricare i nuovi file
      invece di usare quelli in cache (GitHub Pages cachea i file per 10 min). */
-  var MODEL_VERSION = '4';
+  var MODEL_VERSION = '5';
 
   var MODELS = [
     {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18},
@@ -110,8 +110,20 @@
         wrap: wrap, mesh: mesh, phase: i * Math.PI * 2 / 3, spd: spd,
         spin: cfg.spin, ready: true,
         /* esploso: posizioni base dei figli (locali a gltf.scene) */
-        parts: [], explodeT: 0, exploded: false
+        parts: [], explodeT: 0, exploded: false,
+        /* materiali originali: per la finitura "Standard" (ripristino) */
+        origMats: {}
       };
+      /* salva i materiali originali di ogni mesh (clonati) */
+      mesh.traverse(function(o){
+        if (o.isMesh && o.material){
+          var key = o.uuid || (o.name || 'm') + Math.random().toString(36).slice(2, 7);
+          o.userData.finishKey = key;
+          items[i].origMats[key] = Array.isArray(o.material)
+            ? o.material.map(function(m){ return m.clone(); })
+            : o.material.clone();
+        }
+      });
       /* raccogli i mesh figli e le loro posizioni base per l'esploso */
       mesh.traverse(function(o){
         if (o.isMesh){
@@ -341,6 +353,12 @@
   var matMenu = document.createElement('div');
   matMenu.style.cssText = 'position:fixed;z-index:80;display:none;flex-direction:column;gap:6px;padding:10px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(12,12,12,.85);backdrop-filter:blur(10px);box-shadow:0 12px 40px rgba(0,0,0,.5)';
   matMenu.innerHTML = '<div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#999;padding:2px 6px 6px">Finitura</div>';
+  /* voce "Standard" per prima: ripristina il materiale originale della mesh */
+  var stdBtn = document.createElement('button');
+  stdBtn.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;font-size:13px;cursor:pointer;text-align:left';
+  stdBtn.innerHTML = '<span style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#999,#444);border:1px solid rgba(255,255,255,.3);flex-shrink:0"></span>Standard';
+  stdBtn.addEventListener('click', function(){ applyFinish(DETAIL, -1); hideMaterialCallout(); });
+  matMenu.appendChild(stdBtn);
   FINISHES.forEach(function(f, k){
     var b = document.createElement('button');
     b.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;font-size:13px;cursor:pointer;text-align:left';
@@ -377,13 +395,34 @@
     matMenu.style.top = y + 'px';
   }
 
-  /* applica la finitura k all'oggetto idx: ruba il materiale dal mini-GLB,
-     altrimenti usa il fallback procedurale */
+  /* applica la finitura k (o -1 = Standard) alla SOLA mesh cliccata (matTarget.mesh).
+     k>=0: ruba il materiale dal mini-GLB, altrimenti usa il fallback procedurale. */
   function applyFinish(idx, k){
     var it = items[idx]; if (!it) return;
+    /* mesh target: quella cliccata, o tutto il modello se non c'è hit preciso */
+    var target = (matTarget && matTarget.mesh) ? matTarget.mesh : null;
+    if (!target){
+      /* nessuna mesh cliccata: applica alla prima mesh del modello */
+      it.mesh.traverse(function(o){
+        if (!target && o.isMesh) target = o;
+      });
+    }
+    if (!target) return;
+
+    if (k === -1){
+      /* Standard: ripristina il materiale originale della mesh */
+      var orig = it.origMats[target.userData.finishKey];
+      if (orig){
+        target.material = Array.isArray(orig)
+          ? orig.map(function(m){ return m.clone(); })
+          : orig.clone();
+      }
+      return;
+    }
+
     var fin = FINISHES[k];
     if (finishCache[fin.url]){
-      applyMaterialToModel(it, finishCache[fin.url]);
+      applyMaterialToMesh(target, finishCache[fin.url]);
       return;
     }
     /* fallback immediato (poi, se il GLB arriva, sostituisce) */
@@ -392,7 +431,7 @@
       color: fb.color, metalness: fb.metalness, roughness: fb.roughness,
       envMapIntensity: 1.5
     });
-    applyMaterialToModel(it, fallbackMat);
+    applyMaterialToMesh(target, fallbackMat);
     /* prova a rubare il materiale dal mini-GLB (se il file esiste) */
     loader.load(fin.url, function(gltf){
       var stolen = null;
@@ -404,24 +443,20 @@
       if (stolen){
         finishCache[fin.url] = stolen.clone();
         finishCache[fin.url].envMapIntensity = 1.5;
-        applyMaterialToModel(it, finishCache[fin.url]);
+        applyMaterialToMesh(target, finishCache[fin.url]);
       }
     }, undefined, function(){
       /* file non presente: resta il fallback procedurale */
     });
   }
 
-  function applyMaterialToModel(it, mat){
-    /* applica a tutte le parti visibili del modello in focus */
-    it.mesh.traverse(function(o){
-      if (o.isMesh && o.material){
-        if (Array.isArray(o.material)){
-          o.material = o.material.map(function(){ return mat.clone(); });
-        } else {
-          o.material = mat.clone();
-        }
-      }
-    });
+  function applyMaterialToMesh(mesh, mat){
+    if (!mesh) return;
+    if (Array.isArray(mesh.material)){
+      mesh.material = mesh.material.map(function(){ return mat.clone(); });
+    } else {
+      mesh.material = mat.clone();
+    }
   }
 
   /* --- pointer events: grab per ruotare in dettaglio, click per attivare --- */
