@@ -11,13 +11,25 @@
     var s = ts.querySelector('span'); if (s) s.textContent = THEME === 'dark' ? '☀ luce' : '☾ scuro';
   });
 
-  /* marquee: fill da un data-array */
+  /* marquee: fill da un data-array.
+     Duplica il contenuto finché il track è largo almeno 2× il viewport:
+     così l'animazione translateX(-50%) non lascia mai buchi (parole che
+     spariscono per qualche secondo quando la serie è più stretta dello schermo). */
   function fillMarquee(id, items){
     var t = document.getElementById(id); if (!t) return;
-    var h = '';
-    for (var d = 0; d < 2; d++) for (var i = 0; i < items.length; i++)
-      h += '<div class="marquee-item"><span class="m-label">'+items[i]+' <span class="star">✳</span></span></div>';
-    t.innerHTML = h;
+    var one = '';
+    for (var i = 0; i < items.length; i++)
+      one += '<div class="marquee-item"><span class="m-label">'+items[i]+' <span class="star">✳</span></span></div>';
+    var reps = 4; /* minimo 4 copie; cresce se serve */
+    t.innerHTML = '';
+    for (var d = 0; d < reps; d++) t.innerHTML += one;
+    /* se ancora stretto rispetto a 2× viewport, raddoppia finché basta */
+    var vw = window.innerWidth || 1280;
+    var guard = 0;
+    while (t.scrollWidth < vw * 2 && guard < 8){
+      t.innerHTML += one;
+      guard++;
+    }
   }
   var m1 = document.getElementById('m1');
   if (m1) fillMarquee('m1', ['Configuratori 3D','Render & Animazioni','AI applicata','Fotogrammetria','Gaussian Splatting','Rendering prodotto']);
