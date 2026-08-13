@@ -86,6 +86,8 @@
       var c = box.getCenter(new THREE.Vector3());
       mesh.position.sub(c);
       mesh.rotation.y = i * 1.1;
+      /* scala per l'esploso: dimensione del modello normalizzato (~2.4) */
+      var partsScale = box.getSize(new THREE.Vector3()).length() * 0.35 || 1;
 
       var wrap = new THREE.Object3D();
       wrap.add(mesh);
@@ -110,35 +112,59 @@
         wrap: wrap, mesh: mesh, phase: i * Math.PI * 2 / 3, spd: spd,
         spin: cfg.spin, ready: true,
         /* esploso: posizioni base dei figli (locali a gltf.scene) */
-        parts: [], explodeT: 0, exploded: false,
-        /* materiali originali: per la finitura "Standard" (ripristino) */
-        origMats: {}
+        parts: [], explodeT: 0, exploded: false, partsScale: partsScale,
+        /* gruppi di materiale: mesh con la stessa finitura visiva → stessa chiave.
+           La maniglia (1 materiale ovunque) è un solo gruppo; gli altri modelli
+           hanno gruppi separati per ogni finitura distinta. */
+        matGroups: {}
       };
-      /* salva i materiali originali di ogni mesh (clonati) */
+      /* raggruppa le mesh per materiale visivamente identico */
       mesh.traverse(function(o){
-        if (o.isMesh && o.material){
-          var key = o.uuid || (o.name || 'm') + Math.random().toString(36).slice(2, 7);
-          o.userData.finishKey = key;
-          items[i].origMats[key] = Array.isArray(o.material)
-            ? o.material.map(function(m){ return m.clone(); })
-            : o.material.clone();
+        if (!o.isMesh || !o.material) return;
+        var m = Array.isArray(o.material) ? o.material[0] : o.material;
+        var r = Math.round((m.roughness || 0) * 100);
+        var mt = Math.round((m.metalness || 0) * 100);
+        var col = m.color ? m.color.getHex() : 'x';
+        var key = col + '_' + mt + '_' + r;
+        if (!items[i].matGroups[key]){
+          items[i].matGroups[key] = {
+            meshes: [],
+            orig: Array.isArray(o.material)
+              ? o.material.map(function(x){ return x.clone(); })
+              : o.material.clone()
+          };
         }
+        items[i].matGroups[key].meshes.push(o);
+        o.userData.matKey = key;
       });
-      /* raccogli i mesh figli e le loro posizioni base per l'esploso */
+      /* raccogli i mesh figli per l'esploso. Direzioni dal centro del modello,
+         calcolate in world e convertite in spazio locale del gltf.scene:
+         così restano corrette anche con la rotazione del modello. */
+      var worldCtr = new THREE.Vector3();
+      var meshWorld = new THREE.Vector3();
+      mesh.getWorldPosition(meshWorld);
+      var found = 0;
       mesh.traverse(function(o){
-        if (o.isMesh){
-          items[i].parts.push({obj: o, base: o.position.clone(), dir: new THREE.Vector3()});
-        }
-      });
-      /* direzioni di esplosione: dal centro del modello verso ogni parte */
-      var ctr = new THREE.Vector3();
-      mesh.getWorldPosition(ctr);
-      items[i].parts.forEach(function(p){
+        if (!o.isMesh) return;
         var wp = new THREE.Vector3();
-        p.obj.getWorldPosition(wp);
-        p.dir.copy(wp).sub(ctr);
-        if (p.dir.lengthSq() < 0.0001) p.dir.set(0, 1, 0);
-        p.dir.normalize();
+        o.getWorldPosition(wp);
+        worldCtr.add(wp);
+        found++;
+      });
+      if (found) worldCtr.divideScalar(found);
+      mesh.traverse(function(o){
+        if (!o.isMesh) return;
+        var wp = new THREE.Vector3();
+        o.getWorldPosition(wp);
+        var rel = wp.sub(worldCtr);
+        if (rel.lengthSq() < 0.0001) rel.set(0, 1, 0);
+        rel.normalize();
+        /* converti la direzione world in spazio locale del modello */
+        var localDir = rel.clone();
+        mesh.worldToLocal(localDir);
+        if (localDir.lengthSq() < 0.0001) localDir.set(0, 1, 0);
+        localDir.normalize();
+        items[i].parts.push({obj: o, base: o.position.clone(), dir: localDir});
       });
 
       pending--;
@@ -252,11 +278,13 @@
         it.wrap.rotation.y = tp.rot;
         it.mesh.rotation.y += dt * it.spin * 0.6;
       }
-      /* esploso: sposta le parti radialmente (lerp morbido) */
+      /* esploso: sposta le parti radialmente (lerp morbido).
+         Distanza proporzionale alla dimensione del modello: 0.5 = metà
+         della dimensione massima → visibile ma mai "sparato" fuori schermo. */
       if (i === DETAIL && it.parts.length){
         var target = it.exploded ? 1 : 0;
         it.explodeT += (target - it.explodeT) * 0.08;
-        var dist = it.explodeT * 0.55; /* distanza di esplosione */
+        var dist = it.explodeT * 0.5 * it.partsScale;
         it.parts.forEach(function(p){
           p.obj.position.copy(p.base).addScaledVector(p.dir, dist);
         });
@@ -395,34 +423,39 @@
     matMenu.style.top = y + 'px';
   }
 
-  /* applica la finitura k (o -1 = Standard) alla SOLA mesh cliccata (matTarget.mesh).
+  /* applica la finitura k (o -1 = Standard) al GRUPPO MATERIALE della mesh
+     cliccata: tutte le mesh con la stessa finitura visiva cambiano insieme.
      k>=0: ruba il materiale dal mini-GLB, altrimenti usa il fallback procedurale. */
   function applyFinish(idx, k){
     var it = items[idx]; if (!it) return;
-    /* mesh target: quella cliccata, o tutto il modello se non c'è hit preciso */
+    /* mesh target: quella cliccata, o la prima del modello se non c'è hit */
     var target = (matTarget && matTarget.mesh) ? matTarget.mesh : null;
     if (!target){
-      /* nessuna mesh cliccata: applica alla prima mesh del modello */
       it.mesh.traverse(function(o){
         if (!target && o.isMesh) target = o;
       });
     }
     if (!target) return;
+    /* gruppo materiale della mesh cliccata (tutte le mesh con la stessa finitura) */
+    var group = it.matGroups[target.userData.matKey] || null;
+    var meshes = group ? group.meshes : [target];
 
     if (k === -1){
-      /* Standard: ripristina il materiale originale della mesh */
-      var orig = it.origMats[target.userData.finishKey];
+      /* Standard: ripristina il materiale originale del gruppo */
+      var orig = group ? group.orig : null;
       if (orig){
-        target.material = Array.isArray(orig)
-          ? orig.map(function(m){ return m.clone(); })
-          : orig.clone();
+        meshes.forEach(function(m){
+          m.material = Array.isArray(orig)
+            ? orig.map(function(x){ return x.clone(); })
+            : orig.clone();
+        });
       }
       return;
     }
 
     var fin = FINISHES[k];
     if (finishCache[fin.url]){
-      applyMaterialToMesh(target, finishCache[fin.url]);
+      meshes.forEach(function(m){ applyMaterialToMesh(m, finishCache[fin.url]); });
       return;
     }
     /* fallback immediato (poi, se il GLB arriva, sostituisce) */
@@ -431,7 +464,7 @@
       color: fb.color, metalness: fb.metalness, roughness: fb.roughness,
       envMapIntensity: 1.5
     });
-    applyMaterialToMesh(target, fallbackMat);
+    meshes.forEach(function(m){ applyMaterialToMesh(m, fallbackMat); });
     /* prova a rubare il materiale dal mini-GLB (se il file esiste) */
     loader.load(fin.url, function(gltf){
       var stolen = null;
@@ -443,7 +476,7 @@
       if (stolen){
         finishCache[fin.url] = stolen.clone();
         finishCache[fin.url].envMapIntensity = 1.5;
-        applyMaterialToMesh(target, finishCache[fin.url]);
+        meshes.forEach(function(m){ applyMaterialToMesh(m, finishCache[fin.url]); });
       }
     }, undefined, function(){
       /* file non presente: resta il fallback procedurale */

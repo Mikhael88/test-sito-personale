@@ -40,19 +40,47 @@
   if (cli) fillMarquee('mc', CLI);
 
   /* case carousel: fill + velocity-linked loop (solo se presente) */
+  /* case carousel: fill + velocity-linked loop (solo se presente)
+     Card color = payoff d'effetto NON cliccabili (interruzione estetica);
+     card photo = progetti cliccabili. */
+  var PAYOFFS = [
+    'Il 3D non è un render: è il prodotto che parla.',
+    'L\'IA potenzia il modello, non lo sostituisce.',
+    'Coerenza di finiture: il vero lusso digitale.',
+    'Dal fisico al digitale in una sola mossa.',
+    'Un\'immagine coerente vale mille foto.',
+    'Il configuratore vende, il catalogo aspetta.',
+    'La manutenzione si capisce prima di toccare.',
+    'Il prodotto migliore è quello che si spiega da solo.',
+    'Il digitale non è il futuro: è il presente del tuo prodotto.',
+    'Un modello 3D vale più di mille parole tecniche.'
+  ];
+  var payoffIdx = 0;
+  function nextPayoff(){
+    var p = PAYOFFS[payoffIdx % PAYOFFS.length];
+    payoffIdx++;
+    return p;
+  }
   var CASES = [
-    {type:'color', name:'Altrenotti', tag:'Configuratore 3D · 1B+ varianti', cls:'cc-lime', href:'case-study/altrenotti.html'},
     {type:'photo', name:'Altrenotti', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp', href:'case-study/altrenotti.html'},
-    {type:'color', name:'Marmogranito', tag:'Primo configuratore parametrico in Italia', cls:'cc-lav', href:'case-study/marmogranito.html'},
+    {type:'color', cls:'cc-lime', tag:'Payoff'},
     {type:'photo', name:'Marmogranito', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/marmogranito.html'},
-    {type:'color', name:'DND Martinelli', tag:'20K+ immagini coerenti', cls:'cc-surface', href:'case-study/dnd-martinelli.html'},
+    {type:'color', cls:'cc-lav', tag:'Payoff'},
     {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/dnd-martinelli.html'},
-    {type:'color', name:'Robosan', tag:'Animazione + 3D realtime e-commerce', cls:'cc-lime', href:'case-study/robosan.html'},
-    {type:'color', name:'Heltyair', tag:'Configuratore per manutenzione e montaggio', cls:'cc-lav', href:'case-study/heltyair.html'},
-    {type:'color', name:'Bausola 3D', tag:'Landing con 3D e video tecnico', cls:'cc-surface', href:'case-study/bausola-landing.html'}
+    {type:'color', cls:'cc-surface', tag:'Payoff'},
+    {type:'photo', name:'Robosan', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp', href:'case-study/robosan.html'},
+    {type:'color', cls:'cc-lav', tag:'Payoff'},
+    {type:'photo', name:'Heltyair', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/heltyair.html'},
+    {type:'color', cls:'cc-lime', tag:'Payoff'},
+    {type:'photo', name:'Bausola 3D', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/bausola-3d.html'},
+    {type:'color', cls:'cc-surface', tag:'Payoff'}
   ];
   function caseCard(c){
-    if (c.type === 'color') return '<a class="case-card color '+c.cls+'" href="'+c.href+'"><div class="c-tag">'+c.tag+'</div><div class="c-name">'+c.name+'</div></a>';
+    if (c.type === 'color'){
+      /* payoff: card NON cliccabile, solo interruzione estetica */
+      var pay = nextPayoff();
+      return '<div class="case-card color '+c.cls+'" aria-hidden="true"><div class="c-tag">'+c.tag+'</div><div class="c-payoff">'+pay+'</div></div>';
+    }
     return '<a class="case-card photo" href="'+c.href+'"><img src="'+c.img+'" alt="'+c.name+'"><div class="c-name">'+c.name+'</div></a>';
   }
   function fillCase(id, items){

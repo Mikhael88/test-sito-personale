@@ -187,6 +187,10 @@ h1.hero-title{font-family:var(--font-display);font-weight:600;line-height:.98;le
 .cc-lime{background:var(--accent);color:#111}
 .cc-lav{background:var(--additional);color:#101018}
 .cc-surface{background:var(--surface2);color:var(--t-bright)}
+/* card payoff: interruzione estetica NON cliccabile */
+.case-card.color{pointer-events:none;user-select:none}
+.case-card.color .c-payoff{font-family:var(--font-display);font-weight:500;font-size:26px;line-height:1.15;letter-spacing:-.01em;max-width:22ch}
+.case-card.color:hover{transform:none}
 .logos{display:flex;flex-wrap:wrap;gap:16px;margin-top:60px;justify-content:center}
 .logos span{font-family:var(--font-display);font-size:20px;color:var(--t-muted-extra);padding:10px 22px;border:1px solid var(--border);border-radius:999px}
 
