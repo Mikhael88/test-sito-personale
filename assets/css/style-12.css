@@ -303,6 +303,12 @@ h1.hero-title{font-family:var(--font-display);font-weight:600;line-height:.98;le
 .case-tile .ct-tag{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
 .case-tile h3{font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-.01em}
 .case-tile p{color:var(--t-muted);font-size:15px;line-height:1.6;margin-top:12px}
+/* dimensioni alternate "ad incastro" (stile homepage) */
+.case-tile.t-wide{grid-column:1/-1}
+.case-tile.t-wide .ct-media{aspect-ratio:21/9}
+.case-tile.t-wide .ct-body{display:grid;grid-template-columns:auto 1fr;gap:40px;align-items:center;padding:34px 40px}
+.case-tile.t-wide .ct-body h3{font-size:36px}
+.case-tile.t-wide .ct-body p{max-width:52ch;margin-top:0}
 
 /* ---------- CONTATTI form ---------- */
 .contact-grid{max-width:1280px;margin:0 auto;padding:0 48px 110px;display:grid;grid-template-columns:1fr 1fr;gap:70px}
@@ -363,7 +369,7 @@ footer .f-links a:hover{color:var(--accent)}
   .card .ttl{font-size:clamp(26px,8vw,42px);max-width:100%;overflow-wrap:break-word;padding-right:6px;margin-top:12px}
   .card .ttl small{display:none}
   .card .mid{position:static;flex:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start}
-  .card .glb{display:none}
+  .card .glb{display:block;position:absolute;right:6%;bottom:18px;width:min(52%,210px);aspect-ratio:1;opacity:.9}
   .card:last-child .glb{display:block;position:absolute;right:5%;bottom:14px;width:min(52%,200px);aspect-ratio:1}
   .card:last-child{margin-bottom:0}
 
@@ -394,6 +400,10 @@ footer .f-links a:hover{color:var(--accent)}
   .svc-section{padding:20px 24px}
   .svc-item{grid-template-columns:1fr;gap:30px;padding:50px 0}
   .cases-grid{grid-template-columns:1fr;padding:0 24px 70px}
+  .case-tile.t-wide .ct-media{aspect-ratio:16/10}
+  .case-tile.t-wide .ct-body{display:block;padding:28px 26px}
+  .case-tile.t-wide .ct-body h3{font-size:28px}
+  .case-tile.t-wide .ct-body p{margin-top:12px}
   .contact-grid{grid-template-columns:1fr;padding:0 24px 80px;gap:40px}
   .sec{padding:50px 24px}
   .cta-sec{padding:70px 24px calc(70px + env(safe-area-inset-bottom))}

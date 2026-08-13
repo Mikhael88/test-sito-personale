@@ -1,6 +1,6 @@
-# Faccoli · Digitalizzazione Prodotto
+# Michele Faccoli · Consulente Digitale
 
-> Consulente per la digitalizzazione del prodotto manifatturiero. Dal fisico al digitale: configuratori 3D, video tecnici, AI applicata, scansione 3D, fotogrammetria e Gaussian Splatting. Brescia, Nord Italia.
+> Consulente per la digitalizzazione del prodotto manifatturiero. Dal fisico al digitale: configuratori 3D, render e animazioni, AI applicata, scansione 3D, fotogrammetria e Gaussian Splatting. Brescia, Italia (dove sono locato).
 
 ## Chi sono
 Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le aziende manifatturiere a portare il loro prodotto dal fisico al digitale: configuratori 3D realtime, simulazioni, render tecniche, acquisizione 3D da campione reale, orientamento e sviluppo AI su misura.
@@ -18,8 +18,10 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 - Clienti: Altrenotti, Marmogranito, DND Martinelli, Rizzoli, Sunshading, Silverplat, Robosan, Alcofer, Cosmo, Tredo, Prussiani Engineering, Intimissimi, Olfice, Maxema, Heltyair, Limago
 
 ## Contatti
-- Email: ciao@faccioli.it
-- Località: Brescia, Italia (servizio su tutto il Nord Italia)
+- Email: info@michelefaccoli.com
+- Telefono: +39 328 619 1696
+- Località: Brescia, Italia (dove sono locato — mi sposto sul territorio)
+- LinkedIn
 
 ## Pagine
 - [Homepage](https://www.faccioli.it/)
