@@ -2,8 +2,8 @@
 > Modifica una riga (testo a destra di '='), salva, poi `python build.py` (o push).
 > Regole: **x** = grassetto · *x* = corsivo · ~x~ = tratto leggero (hero) · ⏎ = a capo
 
-meta.title = Consulente Digitalizzazione Prodotto | Configuratori 3D — Brescia
-meta.description = Consulente per la digitalizzazione di prodotto nella manifattura del Nord Italia. Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata. Dal fisico al digitale.
+meta.title = Consulente Digitalizzazione Prodotto | Configuratori 3D
+meta.description = Consulente per la digitalizzazione di prodotto nella manifattura italiana. Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata. Dal fisico al digitale.
 hero.eyebrow = Consulente Digitalizzazione Prodotto · Brescia
 hero.titolo = Dall'idea | ~alla~ vendita: | **dal fisico** | ~al~ digitale.
 hero.sub = Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata. Il tuo prodotto manifatturiero, pronto a vendere online.
@@ -13,11 +13,11 @@ servizi.titolo = Servizi
 servizi.cta = Il viaggio del tuo prodotto, dal fisico al digitale.
 servizio.1.tags = Realtime · Mouse
 servizio.1.arialabel = Configuratori 3D — scopri il servizio
-servizio.1.titolo = Configuratori
-servizio.1.desc = Il tuo prodotto reale, in tutte le sue varianti: l'utente sceglie materiali, combinazioni e ordina.
+servizio.1.titolo = Configuratori 3D
+servizio.1.desc = Il tuo prodotto reale, in tutte le sue varianti: l'utente sceglie materiali, combinazioni e compra.
 servizio.2.tags = Rendering · Simulazioni
 servizio.2.arialabel = Render e Animazioni — scopri il servizio
-servizio.2.titolo = Render & animazioni
+servizio.2.titolo = Render & Animazioni
 servizio.2.desc = Viste tecniche, simulazioni di flusso, animazioni meccaniche: raccontiamo insieme il tuo prodotto.
 servizio.3.tags = Orientamento · Analisi · Sviluppo
 servizio.3.arialabel = AI applicata — scopri il servizio
@@ -26,7 +26,7 @@ servizio.3.desc = Capisci quali strumenti AI hanno senso per la tua azienda.
 progetti.titolo = Progetti
 progetti.cta = Tutti i progetti →
 insights.titolo = Insights.
-insights.sub = Esplora una selezione di articoli su digitalizzazione prodotto, configuratori 3D e nuove frontiere tra fisico e digitale.
+insights.sub = Esplora una selezione di articoli su digitalizzazione prodotto, configuratori 3D e nuove frontiere dell'Intelligenza Artificiale
 insights.cta = Tutti gli articoli →
 approccio.titolo = Approccio
 passo.1.titolo = Capire il prodotto

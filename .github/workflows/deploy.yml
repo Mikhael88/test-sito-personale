@@ -22,14 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Genera pagine da content/ (generatore statico)
+      - name: Prepara sito statico (solo i file pubblici)
         run: |
-          python build.py
-          rm -rf content template   # sorgenti (.md + template) non devono finire online
+          mkdir -p _site
+          cp -r index.html *.html assets blog case-study llms.txt .nojekyll _site/ 2>/dev/null || true
       - name: Upload sito statico
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
