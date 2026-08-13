@@ -43,10 +43,15 @@
     });
   }
 
+  /* IMPORTANTE: quando sostituisci i GLB in assets/models/, INCREMENTA questa
+     versione (es. '2' -> '3'): forza il browser a scaricare i nuovi file
+     invece di usare quelli in cache (GitHub Pages cachea i file per 10 min). */
+  var MODEL_VERSION = '2';
+
   var MODELS = [
-    {url: 'assets/models/hero3D1.glb', spin: 0.18},
-    {url: 'assets/models/hero3D2.glb', spin: -0.14},
-    {url: 'assets/models/hero3D3.glb', spin: 0.1}
+    {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18},
+    {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14},
+    {url: 'assets/models/hero3D3.glb?v=' + MODEL_VERSION, spin: 0.1}
   ];
 
   var group = new THREE.Group();
