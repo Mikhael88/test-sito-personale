@@ -98,7 +98,10 @@
         }
       });
 
-      items[i] = {wrap: wrap, mesh: mesh, angle: i * Math.PI * 2 / 3, spin: cfg.spin, ready: true};
+      /* velocità di fase leggermente diverse: le traiettorie derivano e
+         ogni tanto gli oggetti si incontrano → urto con rimbalzo */
+      var spd = SPEED * (0.82 + i * 0.18) * (i % 2 === 0 ? 1 : -1);
+      items[i] = {wrap: wrap, mesh: mesh, phase: i * Math.PI * 2 / 3, spd: spd, spin: cfg.spin, ready: true, cooldown: 0};
       pending--;
     });
   });
@@ -132,7 +135,7 @@
   /* posizioni target: idle = parabola; detail = uno a dx grande, altri a sx fluttuanti */
   function targetPos(it, i, t){
     if (DETAIL === null){
-      var a = it.angle + t * SPEED;
+      var a = it.phase;                       /* fase integrata: niente salti al ritorno */
       var x = Math.sin(a) * RX;
       /* parabola: y = APEX - k·x² → apice al centro (sopra il testo), discesa ai lati */
       var norm = (x / RX) * (x / RX);           /* 0 al centro, 1 ai bordi */
@@ -169,6 +172,36 @@
     requestAnimationFrame(loop);
     var dt = clock.getDelta() || 0.016;
     var t = (performance.now() - t0) / 1000;
+
+    /* integra le fasi (idle): velocità costante, niente salti */
+    if (DETAIL === null){
+      items.forEach(function(it){
+        if (!it || !it.ready) return;
+        it.phase += it.spd * dt;
+        if (it.cooldown > 0) it.cooldown -= dt;
+      });
+      /* urti: quando due oggetti si avvicinano, rimbalzano in direzioni opposte */
+      for (var a = 0; a < items.length; a++){
+        for (var b = a + 1; b < items.length; b++){
+          var A = items[a], B = items[b];
+          if (!A || !B || !A.ready || !B.ready) continue;
+          if (A.cooldown > 0 || B.cooldown > 0) continue;
+          var dx = A.wrap.position.x - B.wrap.position.x;
+          var dy = A.wrap.position.y - B.wrap.position.y;
+          var dz = A.wrap.position.z - B.wrap.position.z;
+          var dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          /* soglia urto: metà delle scale sommate (oggetti visivamente grandi) */
+          var touch = (A.wrap.scale.x + B.wrap.scale.x) * 0.9;
+          if (dist < touch && dist > 0.001){
+            /* scambia le velocità lungo la curva: effetto rimbalzo elastico */
+            var tmp = A.spd;
+            A.spd = B.spd;
+            B.spd = tmp;
+            A.cooldown = 1.2; B.cooldown = 1.2;
+          }
+        }
+      }
+    }
 
     items.forEach(function(it, i){
       if (!it || !it.ready) return;
