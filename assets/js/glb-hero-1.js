@@ -46,7 +46,7 @@
   /* IMPORTANTE: quando sostituisci i GLB in assets/models/, INCREMENTA questa
      versione (es. '2' -> '3'): forza il browser a scaricare i nuovi file
      invece di usare quelli in cache (GitHub Pages cachea i file per 10 min). */
-  var MODEL_VERSION = '2';
+  var MODEL_VERSION = '3';
 
   var MODELS = [
     {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18},
