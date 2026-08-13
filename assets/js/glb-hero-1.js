@@ -57,6 +57,11 @@
   var items = [];
   var pending = MODELS.length;
   var loader = new THREE.GLTFLoader();
+  if (window.THREE.DRACOLoader){
+    var dracoloader = new THREE.DRACOLoader();
+    dracoloader.setDecoderPath('assets/js/vendor/draco/');
+    loader.setDRACOLoader(dracoloader);
+  }
 
   MODELS.forEach(function(cfg, i){
     loader.load(cfg.url, function(gltf){
@@ -93,8 +98,9 @@
     });
   });
 
-  /* orbita ellittica: raggi ridotti e centro spostato a dx (via group) */
-  var RX = 4.1, RZ = 2.1, CY = 0.4, RY = 1.7, SPEED = 0.14; /* rotazione lenta */
+  /* traiettoria PARABOLICA: gli oggetti seguono un arco (parte in basso a sx,
+     sale all'apice sopra il testo, scende in basso a dx) — come da curva verde */
+  var RX = 4.2, APEX = 1.9, BOTTOM = -1.3, SPEED = 0.14; /* rotazione lenta */
 
   /* --- stati interattivi --- */
   var DETAIL = null;      // indice dell'oggetto ingrandito a destra (o null)
@@ -108,33 +114,38 @@
     raycaster.setFromCamera(pointer, camera);
     for (var i = 0; i < items.length; i++){
       var it = items[i]; if (!it || !it.ready) continue;
+      /* 1) hit preciso sulla geometria */
       var hits = raycaster.intersectObject(it.mesh, true);
       if (hits.length) return i;
+      /* 2) fallback tollerante: bounding box del wrap (oggetti sottili/allungati) */
+      var box = new THREE.Box3().setFromObject(it.wrap);
+      if (raycaster.ray.intersectBox(box, new THREE.Vector3())) return i;
     }
     return -1;
   }
 
-  /* posizioni target: idle = orbita; detail = uno a dx grande, altri a sx fluttuanti */
+  /* posizioni target: idle = parabola; detail = uno a dx grande, altri a sx fluttuanti */
   function targetPos(it, i, t){
     if (DETAIL === null){
       var a = it.angle + t * SPEED;
       var x = Math.sin(a) * RX;
-      var z = Math.cos(a) * RZ;
-      var y = CY - Math.cos(a) * RY;
-      var depth = (z + RZ) / (2 * RZ);
-      var s = 0.66 + depth * 0.60;
-      return {x: x, y: y, z: z, s: s, rot: a};
+      /* parabola: y = APEX - k·x² → apice al centro (sopra il testo), discesa ai lati */
+      var norm = (x / RX) * (x / RX);           /* 0 al centro, 1 ai bordi */
+      var y = APEX - (APEX - BOTTOM) * norm;
+      var normY = (y - BOTTOM) / (APEX - BOTTOM); /* 0 in basso, 1 in alto */
+      var s = 0.55 + normY * 0.65;               /* più grande in alto (vicino) */
+      return {x: x, y: y, z: 0.2, s: s, rot: a};
     }
     if (i === DETAIL){
       /* grande a destra del testo, rotazione controllata dall'utente */
-      return {x: 3.9, y: 0.1, z: 1.4, s: 1.85, rot: null};
+      return {x: 3.1, y: 0.1, z: 1.0, s: 1.6, rot: null};
     }
     /* a sinistra, fluttuano lentamente: posizioni distinte per i due rimanenti */
     var others = [0, 1, 2].filter(function(k){ return k !== DETAIL; });
     var slot = others.indexOf(i); /* 0 o 1 */
-    var side = slot === 0 ? -3.2 : -4.6;
-    var fy = Math.sin(t * 0.6 + i * 2.1) * 0.5;
-    return {x: side, y: fy, z: 0.6 + slot * 0.6, s: 0.9, rot: t * 0.12 + i};
+    var side = slot === 0 ? -2.4 : -3.4;
+    var fy = Math.sin(t * 0.6 + i * 2.1) * 0.4;
+    return {x: side, y: fy, z: 0.4 + slot * 0.5, s: 0.85, rot: t * 0.12 + i};
   }
 
   function resize(){
@@ -195,11 +206,12 @@
   function updateCloseX(){
     if (DETAIL === null){ closeBtn.style.display = 'none'; return; }
     var it = items[DETAIL]; if (!it || !it.ready){ return; }
+    var rect = canvas.getBoundingClientRect();
     var p = new THREE.Vector3();
     it.wrap.getWorldPosition(p);
     p.project(camera);
-    var x = (p.x * 0.5 + 0.5) * window.innerWidth;
-    var y = (-p.y * 0.5 + 0.5) * window.innerHeight;
+    var x = (p.x * 0.5 + 0.5) * rect.width + rect.left;
+    var y = (-p.y * 0.5 + 0.5) * rect.height + rect.top;
     closeBtn.style.display = 'block';
     closeBtn.style.left = (x + 30) + 'px';
     closeBtn.style.top = (y - 70) + 'px';
@@ -248,6 +260,19 @@
       });
     },
     setDetail: function(i){ DETAIL = (i === undefined ? null : i); },
-    getDetail: function(){ return DETAIL; }
+    getDetail: function(){ return DETAIL; },
+    screenPos: function(i){
+      var it = items[i]; if (!it || !it.ready) return null;
+      var rect = canvas.getBoundingClientRect();
+      var v = new THREE.Vector3();
+      it.wrap.getWorldPosition(v);
+      v.project(camera);
+      return {
+        x: (v.x * 0.5 + 0.5) * rect.width + rect.left,
+        y: (-v.y * 0.5 + 0.5) * rect.height + rect.top,
+        depth: v.z
+      };
+    },
+    hitTest: function(x, y){ return meshAt(x, y); }
   };
 })();
