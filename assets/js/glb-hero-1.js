@@ -49,7 +49,7 @@
     /* hero3D1: cambio materiale SI, esplodi NO */
     {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18, canFinish: true, canExplode: false, explodeDist: 0.5},
     /* hero3D2: esploso direzionato SI (mappa sotto), cambio materiale NO */
-    {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14, canFinish: false, canExplode: true, explodeDist: 1.1},
+    {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14, canFinish: false, canExplode: true, explodeDist: 0.35},
     /* hero3D3: lascia tutto com'è */
     {url: 'assets/models/hero3D3.glb?v=' + MODEL_VERSION, spin: 0.1, canFinish: true, canExplode: true, explodeDist: 0.5}
   ];
@@ -70,9 +70,11 @@
     }
   };
   /* fattore distanza per nodo (moltiplicatore sulla distanza standard):
-     spirometro = 1/30 → spostamento minimo */
+     cilindri = 0.55 (non sparati), spirometro = 1/30 (appena percettibile) */
   var EXPLODE_DIST = {
     1: {
+      'cilindro-bianco': 0.55,
+      'cilindro-trasparente': 0.55,
       'Mesh003': 1 / 30,
       'Mesh003_1': 1 / 30,
       'Mesh003_2': 1 / 30,
@@ -122,6 +124,17 @@
       wrap.add(mesh);
       group.add(wrap);
 
+      /* animazione opzionale (es. esploso da Blender): se il GLB ne contiene,
+         il pulsante Esplodi diventa play/pausa della clip. */
+      var mixer = null;
+      var clip = null;
+      if (gltf.animations && gltf.animations.length){
+        clip = gltf.animations[0];
+        mixer = new THREE.AnimationMixer(mesh);
+        mixer.clipAction(clip).play();
+        mixer.timeScale = 0; /* parte fermo; Esplodi lo avvia */
+      }
+
       /* potenzia l'HDR sui materiali: più albedo + riflessioni leggibili */
       mesh.traverse(function(o){
         if (o.isMesh && o.material){
@@ -142,6 +155,8 @@
         spin: cfg.spin, ready: true,
         /* esploso: posizioni base dei figli (locali a gltf.scene) */
         parts: [], explodeT: 0, exploded: false, partsScale: partsScale,
+        /* animazione opzionale (esploso da Blender): play/pausa via mixer */
+        mixer: mixer, clip: clip,
         /* gruppi di materiale: mesh con la stessa finitura visiva → stessa chiave.
            La maniglia (1 materiale ovunque) è un solo gruppo; gli altri modelli
            hanno gruppi separati per ogni finitura distinta. */
@@ -305,6 +320,24 @@
       });
     }
 
+    /* aggiorna le animazioni (esploso da Blender) solo del modello in focus:
+       non tocca la rotazione idle degli altri oggetti */
+    if (DETAIL !== null){
+      var mit = items[DETAIL];
+      if (mit && mit.mixer && mit.clip){
+        mit.mixer.update(dt);
+        var act = mit.mixer.clipAction(mit.clip);
+        if (mit.exploded && act.time >= act.getClip().duration - 0.02){
+          /* fine esploso: ferma in posizione */
+          act.paused = true;
+        } else if (!mit.exploded && act.time <= 0.02){
+          /* fine ricomposizione: ferma all'inizio */
+          act.paused = true;
+          mit.mixer.timeScale = 0;
+        }
+      }
+    }
+
     items.forEach(function(it, i){
       if (!it || !it.ready) return;
       var tp = targetPos(it, i, t);
@@ -372,8 +405,16 @@
         other.phase = basePhase + delta;
       });
     }
-    /* 3) esploso: ricomponi sempre */
-    if (it) it.exploded = false;
+    /* 3) esploso: ricomponi sempre (sistema attuale) e azzera l'animazione */
+    if (it){
+      it.exploded = false;
+      if (it.mixer && it.clip){
+        var act = it.mixer.clipAction(it.clip);
+        act.paused = true;
+        act.time = 0;
+        it.mixer.timeScale = 0;
+      }
+    }
     /* 4) chiudi callout materiali ed esplodi */
     hideMaterialCallout();
     explodeBtn.style.display = 'none';
@@ -414,15 +455,33 @@
     explodeBtn.style.top = (y + 120) + 'px';
   }
 
-  /* --- bottone Esplodi (solo in focus) --- */
+  /* --- bottone Esplodi (solo in focus) ---
+     Se il modello ha un'animazione (esploso da Blender): play/pausa clip.
+     Altrimenti: sistema attuale (offset posizioni) come fallback. */
   var explodeBtn = document.createElement('button');
   explodeBtn.setAttribute('aria-label', 'Esplodi il modello 3D');
   explodeBtn.style.cssText = 'position:fixed;z-index:70;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(10,10,10,.75);color:#fff;font-size:14px;letter-spacing:.04em;cursor:pointer;display:none;backdrop-filter:blur(4px)';
   explodeBtn.textContent = '⛶ Esplodi';
   explodeBtn.addEventListener('click', function(){
     var it = items[DETAIL]; if (!it) return;
-    it.exploded = !it.exploded;
-    explodeBtn.textContent = it.exploded ? '✛ Ricomponi' : '⛶ Esplodi';
+    if (it.mixer && it.clip){
+      /* animazione: play avanti / play indietro (toggle) */
+      it.exploded = !it.exploded;
+      var action = it.mixer.clipAction(it.clip);
+      if (it.exploded){
+        action.paused = false;
+        it.mixer.timeScale = 1;
+        if (action.time >= action.getClip().duration - 0.05) action.time = 0;
+      } else {
+        /* torna indietro fino all'inizio, poi si ferma */
+        it.mixer.timeScale = -1;
+        action.paused = false;
+      }
+      explodeBtn.textContent = it.exploded ? '✛ Ricomponi' : '⛶ Esplodi';
+    } else {
+      it.exploded = !it.exploded;
+      explodeBtn.textContent = it.exploded ? '✛ Ricomponi' : '⛶ Esplodi';
+    }
   });
   document.body.appendChild(explodeBtn);
 
