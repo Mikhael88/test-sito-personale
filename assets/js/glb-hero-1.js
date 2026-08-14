@@ -41,15 +41,30 @@
   }
 
   /* IMPORTANTE: quando sostituisci i GLB in assets/models/, INCREMENTA questa
-     versione (es. '3' -> '4'): forza il browser a scaricare i nuovi file
+     versione (es. '5' -> '6'): forza il browser a scaricare i nuovi file
      invece di usare quelli in cache (GitHub Pages cachea i file per 10 min). */
-  var MODEL_VERSION = '5';
+  var MODEL_VERSION = '6';
 
   var MODELS = [
-    {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18},
-    {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14},
-    {url: 'assets/models/hero3D3.glb?v=' + MODEL_VERSION, spin: 0.1}
+    /* hero3D1: cambio materiale SI, esplodi NO */
+    {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18, canFinish: true, canExplode: false, explodeDist: 0.5},
+    /* hero3D2: esploso direzionato SI (mappa sotto), cambio materiale NO */
+    {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14, canFinish: false, canExplode: true, explodeDist: 1.1},
+    /* hero3D3: lascia tutto com'è */
+    {url: 'assets/models/hero3D3.glb?v=' + MODEL_VERSION, spin: 0.1, canFinish: true, canExplode: true, explodeDist: 0.5}
   ];
+
+  /* esploso direzionato per hero3D2 (nodi del GLB):
+     ventola (cilindro-removibile, nero) → indietro; cilindro trasparente e
+     cilindro bianco → avanti; spirometro → fermo. Direzioni in spazio locale. */
+  var EXPLODE_MAP = {
+    1: {
+      'cilindro-removibile': [0, 0, -1],
+      'cilindro-trasparente': [0, 0, 1],
+      'cilindro-bianco': [0, 0, 1],
+      'spirometro': [0, 0, 0]
+    }
+  };
 
   /* finiture selezionabili (mini-GLB con micro-poligono dalla finitura da "rubare").
      Se un file manca, si usa il fallback procedurale corrispondente. */
@@ -137,35 +152,48 @@
         items[i].matGroups[key].meshes.push(o);
         o.userData.matKey = key;
       });
-      /* raccogli i mesh figli per l'esploso. Direzioni dal centro del modello,
-         calcolate in world e convertite in spazio locale del gltf.scene:
-         così restano corrette anche con la rotazione del modello. */
-      var worldCtr = new THREE.Vector3();
-      var meshWorld = new THREE.Vector3();
-      mesh.getWorldPosition(meshWorld);
-      var found = 0;
-      mesh.traverse(function(o){
-        if (!o.isMesh) return;
-        var wp = new THREE.Vector3();
-        o.getWorldPosition(wp);
-        worldCtr.add(wp);
-        found++;
-      });
-      if (found) worldCtr.divideScalar(found);
-      mesh.traverse(function(o){
-        if (!o.isMesh) return;
-        var wp = new THREE.Vector3();
-        o.getWorldPosition(wp);
-        var rel = wp.sub(worldCtr);
-        if (rel.lengthSq() < 0.0001) rel.set(0, 1, 0);
-        rel.normalize();
-        /* converti la direzione world in spazio locale del modello */
-        var localDir = rel.clone();
-        mesh.worldToLocal(localDir);
-        if (localDir.lengthSq() < 0.0001) localDir.set(0, 1, 0);
-        localDir.normalize();
-        items[i].parts.push({obj: o, base: o.position.clone(), dir: localDir});
-      });
+      /* raccogli i mesh figli per l'esploso. Se esiste una mappa direzionata
+         per questo modello (EXPLODE_MAP), usa quelle direzioni (per nome nodo);
+         altrimenti direzioni radiali dal centro del modello, convertite in
+         spazio locale del gltf.scene. */
+      var explodeMap = EXPLODE_MAP[i] || null;
+      if (explodeMap){
+        mesh.traverse(function(o){
+          if (!o.isMesh) return;
+          var nodeName = o.name || (o.parent && o.parent.name) || '';
+          var dir = explodeMap[nodeName] || [0, 0, 0];
+          items[i].parts.push({
+            obj: o, base: o.position.clone(),
+            dir: new THREE.Vector3(dir[0], dir[1], dir[2]),
+            nodeName: nodeName
+          });
+        });
+      } else {
+        var worldCtr = new THREE.Vector3();
+        var found = 0;
+        mesh.traverse(function(o){
+          if (!o.isMesh) return;
+          var wp = new THREE.Vector3();
+          o.getWorldPosition(wp);
+          worldCtr.add(wp);
+          found++;
+        });
+        if (found) worldCtr.divideScalar(found);
+        mesh.traverse(function(o){
+          if (!o.isMesh) return;
+          var wp = new THREE.Vector3();
+          o.getWorldPosition(wp);
+          var rel = wp.sub(worldCtr);
+          if (rel.lengthSq() < 0.0001) rel.set(0, 1, 0);
+          rel.normalize();
+          /* converti la direzione world in spazio locale del modello */
+          var localDir = rel.clone();
+          mesh.worldToLocal(localDir);
+          if (localDir.lengthSq() < 0.0001) localDir.set(0, 1, 0);
+          localDir.normalize();
+          items[i].parts.push({obj: o, base: o.position.clone(), dir: localDir});
+        });
+      }
 
       pending--;
     });
@@ -279,12 +307,13 @@
         it.mesh.rotation.y += dt * it.spin * 0.6;
       }
       /* esploso: sposta le parti radialmente (lerp morbido).
-         Distanza proporzionale alla dimensione del modello: 0.5 = metà
-         della dimensione massima → visibile ma mai "sparato" fuori schermo. */
-      if (i === DETAIL && it.parts.length){
+         Distanza proporzionale alla dimensione del modello × explodeDist:
+         hero3D2 usa una distanza maggiore per l'effetto assiale (ventola
+         indietro, cilindri avanti, spirometro fermo). */
+      if (i === DETAIL && it.parts.length && MODELS[i].canExplode){
         var target = it.exploded ? 1 : 0;
         it.explodeT += (target - it.explodeT) * 0.08;
-        var dist = it.explodeT * 0.5 * it.partsScale;
+        var dist = it.explodeT * MODELS[i].explodeDist * it.partsScale;
         it.parts.forEach(function(p){
           p.obj.position.copy(p.base).addScaledVector(p.dir, dist);
         });
@@ -350,9 +379,13 @@
     closeBtn.style.top = (y - 70) + 'px';
   }
 
-  /* il bottone Esplodi segue l'oggetto in focus (sotto di esso) */
+  /* il bottone Esplodi segue l'oggetto in focus (sotto di esso).
+     Visibile solo per i modelli con canExplode (hero3D1: niente esploso). */
   function updateExplodeBtn(){
-    if (DETAIL === null){ explodeBtn.style.display = 'none'; return; }
+    if (DETAIL === null || !MODELS[DETAIL] || !MODELS[DETAIL].canExplode){
+      explodeBtn.style.display = 'none';
+      return;
+    }
     var it = items[DETAIL]; if (!it || !it.ready){ return; }
     var rect = canvas.getBoundingClientRect();
     var p = new THREE.Vector3();
@@ -529,8 +562,8 @@
       items[i].exploded = false;
     } else if (DETAIL === i){
       /* click sull'oggetto già in focus: callout materiali sul punto cliccato.
-         Se il punto esatto non colpisce la geometria (centri vuoti), ripiega
-         sul centro del modello così il menu si apre comunque. */
+         Solo per i modelli con canFinish (hero3D2: niente cambio materiale). */
+      if (!MODELS[i] || !MODELS[i].canFinish) return;
       var hp = hitPoint(e.clientX, e.clientY, i);
       if (!hp){
         var ctr = new THREE.Vector3();
