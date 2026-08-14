@@ -56,13 +56,27 @@
 
   /* esploso direzionato per hero3D2 (nodi del GLB):
      ventola (cilindro-removibile, nero) → indietro; cilindro trasparente e
-     cilindro bianco → avanti; spirometro → fermo. Direzioni in spazio locale. */
+     cilindro bianco → avanti; spirometro (Mesh003*) → indietro INVERTITO
+     con distanza ridotta a 1/30 (movimento appena percettibile). */
   var EXPLODE_MAP = {
     1: {
       'cilindro-removibile': [0, 0, -1],
       'cilindro-trasparente': [0, 0, 1],
       'cilindro-bianco': [0, 0, 1],
-      'spirometro': [0, 0, 0]
+      'Mesh003': [0, 0, -1],
+      'Mesh003_1': [0, 0, -1],
+      'Mesh003_2': [0, 0, -1],
+      'spirometro': [0, 0, -1]
+    }
+  };
+  /* fattore distanza per nodo (moltiplicatore sulla distanza standard):
+     spirometro = 1/30 → spostamento minimo */
+  var EXPLODE_DIST = {
+    1: {
+      'Mesh003': 1 / 30,
+      'Mesh003_1': 1 / 30,
+      'Mesh003_2': 1 / 30,
+      'spirometro': 1 / 30
     }
   };
 
@@ -157,6 +171,7 @@
          altrimenti direzioni radiali dal centro del modello, convertite in
          spazio locale del gltf.scene. */
       var explodeMap = EXPLODE_MAP[i] || null;
+      var explodeDistMap = EXPLODE_DIST[i] || null;
       if (explodeMap){
         mesh.traverse(function(o){
           if (!o.isMesh) return;
@@ -165,7 +180,8 @@
           items[i].parts.push({
             obj: o, base: o.position.clone(),
             dir: new THREE.Vector3(dir[0], dir[1], dir[2]),
-            nodeName: nodeName
+            nodeName: nodeName,
+            distFactor: (explodeDistMap && explodeDistMap[nodeName]) || 1
           });
         });
       } else {
@@ -315,7 +331,7 @@
         it.explodeT += (target - it.explodeT) * 0.08;
         var dist = it.explodeT * MODELS[i].explodeDist * it.partsScale;
         it.parts.forEach(function(p){
-          p.obj.position.copy(p.base).addScaledVector(p.dir, dist);
+          p.obj.position.copy(p.base).addScaledVector(p.dir, dist * (p.distFactor || 1));
         });
       }
       it.mesh.visible = true;
@@ -613,6 +629,13 @@
       var p = screenPosOf(i);
       return p.x || p.y ? p : null;
     },
-    hitTest: function(x, y){ return meshAt(x, y); }
+    hitTest: function(x, y){ return meshAt(x, y); },
+    partsInfo: function(i){
+      var it = items[i]; if (!it || !it.ready) return 'loading';
+      return it.parts.map(function(p){
+        var n = p.nodeName || (p.obj.name || (p.obj.parent && p.obj.parent.name) || '?');
+        return n + ': dir=' + p.dir.x.toFixed(2) + ',' + p.dir.y.toFixed(2) + ',' + p.dir.z.toFixed(2);
+      }).join(' | ');
+    }
   };
 })();
