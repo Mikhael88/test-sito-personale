@@ -6,7 +6,7 @@
 <title>{{meta.title}}</title>
 <meta name="description" content="{{meta.description}}">
 <meta name="robots" content="index,follow">
-<link rel="canonical" href="https://www.faccioli.it/">
+<link rel="canonical" href="https://michelefaccoli.com/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;500;600;700&family=Funnel+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -15,21 +15,23 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Consulente Digitalizzazione Prodotto | Configuratori 3D — Brescia">
 <meta property="og:description" content="Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata per la manifattura italiana. Dal fisico al digitale.">
-<meta property="og:url" content="https://www.faccioli.it/">
+<meta property="og:url" content="https://michelefaccoli.com/">
+<meta property="og:image" content="https://michelefaccoli.com/assets/img/hero-configuratore.webp">
 <meta property="og:locale" content="it_IT">
 <meta property="og:site_name" content="Michele Faccoli · Consulente Digitale">
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Consulente Digitalizzazione Prodotto | Configuratori 3D — Brescia">
 <meta name="twitter:description" content="Configuratori 3D realtime, animazioni tecniche, ricostruzione dal campione fisico e AI applicata per la manifattura italiana.">
+<meta name="twitter:image" content="https://michelefaccoli.com/assets/img/hero-configuratore.webp">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "name": "Michele Faccoli - Consulente Digitale",
-  "url": "https://www.faccioli.it/",
+  "url": "https://michelefaccoli.com/",
   "email": "info@michelefaccoli.com",
-  "image": "https://www.faccioli.it/og.jpg",
+  "image": "https://michelefaccoli.com/assets/img/hero-configuratore.webp",
   "address": {"@type":"PostalAddress","addressLocality":"Brescia","addressRegion":"Lombardia","addressCountry":"IT"},
   "geo": {"@type":"GeoCoordinates","latitude":45.5416,"longitude":10.2118},
   "areaServed": "Italia",
@@ -48,7 +50,7 @@
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "Michele Faccoli - Consulente Digitale",
-  "url": "https://www.faccioli.it/"
+  "url": "https://michelefaccoli.com/"
 }
 </script>
 </head>
@@ -62,6 +64,7 @@
     <a href="blog.html">Blog</a>
     <a href="contatti.html">Contatti</a>
   </div>
+  <button class="nav-toggle" aria-expanded="false" aria-controls="nav-links" aria-label="Apri menu"><span></span><span></span><span></span></button>
   <button class="theme-switch" aria-label="Cambia tema"><span>☀ luce</span></button>
 </nav>
 
@@ -76,6 +79,7 @@
       <a class="pill lime" href="servizi.html">{{hero.cta1}}</a>
       <a class="pill ghost" href="case-history.html">{{hero.cta2}}</a>
     </div>
+    <p class="hero-phone">Preferisci parlare? <a href="tel:+393286191696">+39 328 619 1696</a> · Brescia</p>
   </div>
 
   <div class="marquee">
@@ -99,7 +103,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.1.titolo}}<small>{{servizio.1.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-configuratori.webp" alt=""></div>
+        <div class="glb"><img src="assets/img/card-configuratori.webp" alt="Configuratore 3D di prodotti industriali" loading="lazy" decoding="async"></div>
       </div>
     </section>
     <section class="card c-g">
@@ -110,7 +114,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.2.titolo}}<small>{{servizio.2.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-video.webp" alt=""></div>
+        <div class="glb"><img src="assets/img/card-video.webp" alt="Animazioni tecniche e video di prodotto" loading="lazy" decoding="async"></div>
       </div>
     </section>
     <section class="card c-l">
@@ -121,7 +125,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.3.titolo}}<small>{{servizio.3.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-ai.webp" alt=""></div>
+        <div class="glb"><img src="assets/img/card-ai.webp" alt="Applicazioni AI per la manifattura" loading="lazy" decoding="async"></div>
       </div>
     </section>
   </div>
@@ -133,6 +137,10 @@
       <h2 class="sec-title">{{progetti.titolo}}</h2>
     </div>
     <a class="sec-cta" href="case-history.html">{{progetti.cta}}</a>
+    <div class="car-nav" role="group" aria-label="Scorri i progetti">
+      <button class="car-btn" data-dir="-1" aria-label="Scorri indietro">‹</button>
+      <button class="car-btn" data-dir="1" aria-label="Scorri avanti">›</button>
+    </div>
   </div>
   <div class="case-rows">
     <div class="case-row"><div class="case-track" id="case-a"></div></div>
@@ -151,7 +159,7 @@
   </div>
   <div class="bgrid">
     <article class="bcard rv">
-      <a class="bmedia" href="blog/dall-idea-al-configuratore.html"><img src="assets/img/card-configuratori.webp" alt=""><span class="btags"><i>Configuratori</i><i>3D</i></span></a>
+      <a class="bmedia" href="blog/dall-idea-al-configuratore.html"><img src="assets/img/card-configuratori.webp" alt="Configuratore 3D realtime di un prodotto industriale" loading="lazy" decoding="async"><span class="btags"><i>Configuratori</i><i>3D</i></span></a>
       <div class="bbody">
         <time>05 Ago 2026</time>
         <h3 class="btitle"><a href="blog/dall-idea-al-configuratore.html">Dall'idea al configuratore: come vendere il tuo prodotto online</a></h3>
@@ -159,7 +167,7 @@
       </div>
     </article>
     <article class="bcard rv" data-d="1">
-      <a class="bmedia" href="blog/gaussian-splatting-per-il-prodotto.html"><img src="assets/img/blog-gaussian.webp" alt=""><span class="btags"><i>Fotogrammetria</i><i>Drone</i></span></a>
+      <a class="bmedia" href="blog/gaussian-splatting-per-il-prodotto.html"><img src="assets/img/blog-gaussian.webp" alt="Ricostruzione Gaussian Splatting di un prodotto" loading="lazy" decoding="async"><span class="btags"><i>Fotogrammetria</i><i>Drone</i></span></a>
       <div class="bbody">
         <time>28 Giu 2026</time>
         <h3 class="btitle"><a href="blog/gaussian-splatting-per-il-prodotto.html">Gaussian Splatting per il prodotto: tra fisico, digitale e 3D realtime</a></h3>
@@ -167,7 +175,7 @@
       </div>
     </article>
     <article class="bcard rv" data-d="2">
-      <a class="bmedia" href="blog/rendering-e-ai.html"><img src="assets/img/blog-rendering-ai.webp" alt=""><span class="btags"><i>AI</i><i>Rendering</i></span></a>
+      <a class="bmedia" href="blog/rendering-e-ai.html"><img src="assets/img/blog-rendering-ai.webp" alt="Rendering di prodotto assistito dall'AI" loading="lazy" decoding="async"><span class="btags"><i>AI</i><i>Rendering</i></span></a>
       <div class="bbody">
         <time>12 Mag 2026</time>
         <h3 class="btitle"><a href="blog/rendering-e-ai.html">Rendering e AI: dove la qualità la fa ancora il modello, non il prompt</a></h3>
@@ -175,7 +183,7 @@
       </div>
     </article>
     <article class="bcard rv" data-d="3">
-      <a class="bmedia" href="blog/dal-campione-reale-alla-mesh.html"><img src="assets/img/blog-campione-mesh.webp" alt=""><span class="btags"><i>Scanner</i><i>Mesh</i></span></a>
+      <a class="bmedia" href="blog/dal-campione-reale-alla-mesh.html"><img src="assets/img/blog-campione-mesh.webp" alt="Campione fisico scansionato in mesh 3D" loading="lazy" decoding="async"><span class="btags"><i>Scanner</i><i>Mesh</i></span></a>
       <div class="bbody">
         <time>02 Mar 2026</time>
         <h3 class="btitle"><a href="blog/dal-campione-reale-alla-mesh.html">Dal campione reale alla mesh: quando l'azienda non ha proprio nulla di digitale</a></h3>
@@ -238,7 +246,7 @@
     info@michelefaccoli.com<br>+39 328 619 1696<br>Brescia, Italia
   </div>
   <div>
-    <div class="f-title">Ecosystem</div>
+    <div class="f-title">Online</div>
     <div class="f-links"><a href="https://www.linkedin.com/">LinkedIn</a></div>
   </div>
 </footer>

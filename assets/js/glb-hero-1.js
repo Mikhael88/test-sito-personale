@@ -10,6 +10,7 @@
    - X sopra l'oggetto grande: si torna alla parabola con riallineamento equidistante
      e rotazione dell'oggetto ripristinata a com'era prima del focus. */
 (function(){
+  function startHero(){
   var canvas = document.getElementById('hero3d');
   var hero = document.querySelector('.hero');
   if (!canvas || !hero || !window.THREE || !window.THREE.GLTFLoader) return;
@@ -230,9 +231,9 @@
     });
   });
 
-  /* traiettoria PARABOLICA: gli oggetti seguono un arco (parte in basso a sx,
-     sale all'apice sopra il testo, scende in basso a dx) — come da curva verde */
-  var RX = 4.2, APEX = 1.9, BOTTOM = -1.3, SPEED = 0.14; /* rotazione lenta */
+  /* traiettoria ELLITTICA: gli oggetti orbitano attorno al testo centrale su
+     un'ellisse (RX orizzontale, RY verticale), fasi equidistanti 120°. */
+  var RX = 4.2, RY = 2.4, SPEED = 0.14; /* velocità orbitale lenta */
 
   /* --- stati interattivi --- */
   var DETAIL = null;      // indice dell'oggetto ingrandito a destra (o null)
@@ -273,16 +274,16 @@
     return {point: h.point.clone(), mesh: h.object};
   }
 
-  /* posizioni target: idle = parabola; detail = uno a dx grande, altri a sx fissi */
+  /* posizioni target: idle = ellisse attorno al testo; detail = uno a dx grande,
+     altri a sx fissi. rot: null = rotazione gestita altrove (spin/drag). */
   function targetPos(it, i, t){
     if (DETAIL === null){
       var a = it.phase;
       var x = Math.sin(a) * RX;
-      var norm = (x / RX) * (x / RX);
-      var y = APEX - (APEX - BOTTOM) * norm;
-      var normY = (y - BOTTOM) / (APEX - BOTTOM);
-      var s = 0.55 + normY * 0.65;
-      return {x: x, y: y, z: 0.2, s: s, rot: a};
+      var y = Math.cos(a) * RY;
+      /* scala leggermente più grande in alto, più piccola in basso (profondità) */
+      var s = 0.7 + (y / RY) * 0.3;
+      return {x: x, y: y, z: 0.2, s: s, rot: null};
     }
     if (i === DETAIL){
       /* grande a destra del testo, rotazione controllata dall'utente */
@@ -291,8 +292,8 @@
     /* a sinistra, posizioni FISSE ben distanziate: mai sovrapposti */
     var others = [0, 1, 2].filter(function(k){ return k !== DETAIL; });
     var slot = others.indexOf(i); /* 0 o 1 */
-    if (slot === 0) return {x: -2.6, y: 0.5, z: 0.5, s: 0.78, rot: t * 0.1 + i};
-    return {x: -4.8, y: -0.4, z: 1.0, s: 0.72, rot: t * 0.1 + i};
+    if (slot === 0) return {x: -2.6, y: 0.5, z: 0.5, s: 0.78, rot: null};
+    return {x: -4.8, y: -0.4, z: 1.0, s: 0.72, rot: null};
   }
 
   function resize(){
@@ -309,6 +310,9 @@
 
   function loop(){
     requestAnimationFrame(loop);
+    /* sospendi il render quando il hero è fuori schermo (CPU/batteria) */
+    var _r = canvas.getBoundingClientRect(); var _vh = window.innerHeight || 800;
+    if (_r.bottom < -_vh * 0.5 || _r.top > _vh * 1.5) return;
     var dt = clock.getDelta() || 0.016;
     var t = (performance.now() - t0) / 1000;
 
@@ -347,12 +351,15 @@
       var ns = it.wrap.scale.x + (tp.s - it.wrap.scale.x) * 0.06;
       it.wrap.scale.setScalar(ns);
       if (DETAIL === null){
-        it.wrap.rotation.y = tp.rot;
+        /* idle: wrap stabile (niente rotazione di fase), solo il mesh ruota su
+           se stesso con lo spin — niente doppia rotazione "impazzita" */
+        it.wrap.rotation.y = 0;
         it.mesh.rotation.y += dt * it.spin;
       } else if (i === DETAIL){
         /* in dettaglio: rotazione solo via drag (nessuno spin automatico) */
       } else {
-        it.wrap.rotation.y = tp.rot;
+        /* oggetti a sinistra in focus: wrap stabile, spin ridotto */
+        it.wrap.rotation.y = 0;
         it.mesh.rotation.y += dt * it.spin * 0.6;
       }
       /* esploso: sposta le parti radialmente (lerp morbido).
@@ -697,4 +704,12 @@
       }).join(' | ');
     }
   };
+  } /* fine: startHero */
+  /* boot differito: parte quando il browser è libero, così non blocca il primo render */
+  var _hc = document.getElementById('hero3d');
+  if (_hc){
+    var _boot = function(){ startHero(); };
+    if (window.requestIdleCallback) window.requestIdleCallback(_boot, {timeout: 1500});
+    else setTimeout(_boot, 300);
+  }
 })();

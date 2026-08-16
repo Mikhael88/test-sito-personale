@@ -1,6 +1,7 @@
 /* Faccoli · Digitalizzazione Prodotto — JS condiviso statico
    Difensivo: ogni blocco verifica l'esistenza dei suoi elementi prima di agire. */
 (function(){
+  document.documentElement.classList.add('js');
   var THEME = document.documentElement.getAttribute('data-theme') || 'dark';
 
   /* toggle tema */
@@ -10,6 +11,23 @@
     document.documentElement.setAttribute('data-theme', THEME);
     var s = ts.querySelector('span'); if (s) s.textContent = THEME === 'dark' ? '☀ luce' : '☾ scuro';
   });
+
+  /* menu mobile: hamburger + pannello (chiusura: link, Esc, click fuori) */
+  var nt = document.querySelector('.nav-toggle');
+  var nl = document.querySelector('.nav-links');
+  if (nt && nl){
+    function setNav(open){
+      nl.classList.toggle('open', open);
+      nt.setAttribute('aria-expanded', open ? 'true' : 'false');
+      nt.setAttribute('aria-label', open ? 'Chiudi menu' : 'Apri menu');
+    }
+    nt.addEventListener('click', function(){ setNav(!nl.classList.contains('open')); });
+    nl.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setNav(false); }); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') setNav(false); });
+    document.addEventListener('click', function(e){
+      if (nl.classList.contains('open') && !nl.contains(e.target) && !nt.contains(e.target)) setNav(false);
+    });
+  }
 
   /* marquee: fill da un data-array.
      Duplica il contenuto finché il track è largo almeno 2× il viewport:
@@ -39,6 +57,12 @@
   var cli = document.getElementById('mc');
   if (cli) fillMarquee('mc', CLI);
 
+  /* pausa motion fuori viewport (WCAG 2.2.2): marquee */
+  var mIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ e.target.classList.toggle('paused', !e.isIntersecting); });
+  }, {rootMargin:'80px 0px 80px 0px'});
+  document.querySelectorAll('.marquee').forEach(function(m){ mIO.observe(m); });
+
   /* case carousel: fill + velocity-linked loop (solo se presente) */
   /* case carousel: fill + velocity-linked loop (solo se presente)
      Card color = payoff d'effetto NON cliccabili (interruzione estetica);
@@ -62,26 +86,29 @@
     return p;
   }
   var CASES = [
-    {type:'photo', name:'Altrenotti', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp', href:'case-study/altrenotti.html'},
-    {type:'color', cls:'cc-lime', tag:'Payoff'},
-    {type:'photo', name:'Marmogranito', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/marmogranito.html'},
-    {type:'color', cls:'cc-lav', tag:'Payoff'},
-    {type:'photo', name:'DND', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/dnd-martinelli.html'},
-    {type:'color', cls:'cc-surface', tag:'Payoff'},
-    {type:'photo', name:'Robosan', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-01.webp', href:'case-study/robosan.html'},
-    {type:'color', cls:'cc-lav', tag:'Payoff'},
-    {type:'photo', name:'Heltyair', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-02.webp', href:'case-study/heltyair.html'},
-    {type:'color', cls:'cc-lime', tag:'Payoff'},
-    {type:'photo', name:'Bausola 3D', img:'https://demo.oceanthemes.site/rayo-dark/wp-content/uploads/sites/15/2025/10/1200x1000_marquee-03.webp', href:'case-study/bausola-3d.html'},
-    {type:'color', cls:'cc-surface', tag:'Payoff'}
+    {type:'photo', name:'Altrenotti', img:'assets/img/case-altrenotti.webp', href:'case-study/altrenotti.html'},
+    {type:'color', cls:'cc-lime'},
+    {type:'photo', name:'Marmogranito', img:'assets/img/case-marmogranito.webp', href:'case-study/marmogranito.html'},
+    {type:'color', cls:'cc-lav'},
+    {type:'photo', name:'DND', img:'assets/img/case-dnd.webp', href:'case-study/dnd-martinelli.html'},
+    {type:'color', cls:'cc-surface'},
+    {type:'brand', name:'Robosan', cls:'cc-lav', href:'case-study/robosan.html'},
+    {type:'color', cls:'cc-lime'},
+    {type:'brand', name:'Heltyair', cls:'cc-surface', href:'case-study/heltyair.html'},
+    {type:'color', cls:'cc-lav'},
+    {type:'photo', name:'Bausola 3D', img:'assets/img/case-bausola.webp', href:'case-study/bausola-3d.html'},
+    {type:'color', cls:'cc-lime'}
   ];
   function caseCard(c){
+    if (c.type === 'brand'){
+      return '<a class="case-card color brand '+(c.cls||'cc-surface')+'" href="'+c.href+'"><div class="c-name">'+c.name+'</div><div class="c-payoff">Caso studio completo →</div></a>';
+    }
     if (c.type === 'color'){
       /* payoff: card NON cliccabile, solo interruzione estetica */
       var pay = nextPayoff();
-      return '<div class="case-card color '+c.cls+'" aria-hidden="true"><div class="c-tag">'+c.tag+'</div><div class="c-payoff">'+pay+'</div></div>';
+      return '<div class="case-card color '+c.cls+'" aria-hidden="true"><div class="c-payoff">'+pay+'</div></div>';
     }
-    return '<a class="case-card photo" href="'+c.href+'"><img src="'+c.img+'" alt="'+c.name+'"><div class="c-name">'+c.name+'</div></a>';
+    return '<a class="case-card photo" href="'+c.href+'"><img src="'+c.img+'" alt="Caso studio '+c.name+'" loading="lazy" decoding="async"><div class="c-name">'+c.name+'</div></a>';
   }
   function fillCase(id, items){
     var t = document.getElementById(id); if (!t) return 0;
@@ -92,6 +119,20 @@
   var setB = fillCase('case-b', CASES.slice().reverse());
   if (document.getElementById('case-a')) {
     var scrollVel = 0, lastY = window.scrollY, posA = 0, posB = 0, caseReady = false;
+    var caseVisible = true, caseHover = false;
+    var cIO = new IntersectionObserver(function(en){ en.forEach(function(e){ caseVisible = e.isIntersecting; }); }, {rootMargin:'120px 0px'});
+    var rowsHost = document.querySelector('.case-rows'); if (rowsHost) cIO.observe(rowsHost);
+    /* frecce del carosello (navigazione esplicita, oltre al drag) */
+    document.querySelectorAll('.car-btn').forEach(function(b){
+      b.addEventListener('click', function(){
+        if (!setA) return;
+        var dir = b.dataset.dir === '1' ? -1 : 1;
+        posA += dir * (setA / CASES.length);
+        while (posA <= -setA) posA += setA;
+        while (posA > 0) posA -= setA;
+        var a = document.getElementById('case-a'); if (a) a.style.transform = 'translateX(' + posA + 'px)';
+      });
+    });
     window.addEventListener('scroll', function(){ var y = window.scrollY; scrollVel = y - lastY; lastY = y; }, {passive:true});
 
     /* drag con mouse/dito (Pointer Events: funziona touch e desktop).
@@ -100,6 +141,8 @@
     var dragCase = null, dragStartX = 0, dragDelta = 0, dragLastX = 0, dragVel = 0;
     var rows = document.querySelector('.case-rows');
     if (rows){
+      rows.addEventListener('mouseenter', function(){ caseHover = true; });
+      rows.addEventListener('mouseleave', function(){ caseHover = false; });
       rows.addEventListener('pointerdown', function(e){
         dragCase = {id: e.pointerId};
         dragStartX = dragLastX = e.clientX;
@@ -134,6 +177,7 @@
     }
 
     function caseLoop(){
+      if (!caseVisible || caseHover){ requestAnimationFrame(caseLoop); return; }
       if (caseReady && setA && setB){
         scrollVel *= 0.9;
         var base = 0.6, boost = Math.min(Math.abs(scrollVel) * 0.35, 14);
@@ -215,5 +259,51 @@
       }
       requestAnimationFrame(pTick);
     }
+  }
+
+  /* form contatti: invio AJAX + stato visibile + fallback */
+  var form = document.querySelector('.contact-form');
+  if (form){
+    var stEl = document.createElement('div');
+    stEl.setAttribute('role', 'status');
+    stEl.setAttribute('aria-live', 'polite');
+    stEl.style.display = 'none';
+    stEl.style.cssText += ';margin-top:18px;padding:14px 16px;border-radius:12px;font-size:15px;line-height:1.5';
+    form.appendChild(stEl);
+    function status(msg, ok){
+      stEl.textContent = msg;
+      stEl.style.display = 'block';
+      stEl.style.background = ok ? 'rgba(var(--accent-rgb),.14)' : 'rgba(255,110,110,.14)';
+      stEl.style.color = ok ? 'var(--accent)' : '#ff9a9a';
+      stEl.style.border = '1px solid ' + (ok ? 'rgba(var(--accent-rgb),.45)' : 'rgba(255,140,140,.45)');
+    }
+    form.addEventListener('submit', function(ev){
+      ev.preventDefault();
+      if (!form.checkValidity()){ form.reportValidity(); return; }
+      var fd = new FormData(form);
+      var payload = {};
+      fd.forEach(function(v, k){ payload[k] = v; });
+      payload._subject = 'Richiesta dal sito michelefaccoli.com';
+      var btn = form.querySelector('button[type="submit"]');
+      var oldLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = 'Invio in corso…';
+      fetch('https://formsubmit.co/ajax/info@michelefaccoli.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).then(function(j){
+        if (j && (j.success === 'true' || j.success === true)){
+          form.reset();
+          btn.disabled = false;
+          btn.textContent = 'Richiesta inviata ✓';
+          status('Grazie! Rispondo entro un giorno lavorativo', true);
+        } else { throw new Error('submit-failed'); }
+      }).catch(function(){
+        btn.disabled = false;
+        btn.textContent = oldLabel;
+        status('Invio non riuscito. Scrivimi direttamente: info@michelefaccoli.com', false);
+      });
+    });
   }
 })();

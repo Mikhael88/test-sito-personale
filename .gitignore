@@ -4,3 +4,6 @@
 REPORT-*.md
 .bak/
 _archive/
+
+# artefatto critica impeccable (snapshot locali)
+.impeccable/
