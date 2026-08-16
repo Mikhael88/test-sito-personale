@@ -44,15 +44,17 @@
   /* IMPORTANTE: quando sostituisci i GLB in assets/models/, INCREMENTA questa
      versione (es. '5' -> '6'): forza il browser a scaricare i nuovi file
      invece di usare quelli in cache (GitHub Pages cachea i file per 10 min). */
-  var MODEL_VERSION = '6';
+  var MODEL_VERSION = '7';
 
   var MODELS = [
     /* hero3D1: cambio materiale SI, esplodi NO */
     {url: 'assets/models/hero3D1.glb?v=' + MODEL_VERSION, spin: 0.18, canFinish: true, canExplode: false, explodeDist: 0.5},
     /* hero3D2: esploso direzionato SI (mappa sotto), cambio materiale NO */
     {url: 'assets/models/hero3D2.glb?v=' + MODEL_VERSION, spin: -0.14, canFinish: false, canExplode: true, explodeDist: 0.35},
-    /* hero3D3: lascia tutto com'è */
-    {url: 'assets/models/hero3D3.glb?v=' + MODEL_VERSION, spin: 0.1, canFinish: true, canExplode: true, explodeDist: 0.5}
+    /* hero3D3-bis: PROVETTE + VENTOLE. Le ventole partono al frame 42 della clip;
+       nei secondi prima, a codice parte lo spray d'acqua fine (particelle). */
+    {url: 'assets/models/hero3D3-bis.glb?v=' + MODEL_VERSION, spin: 0.1, canFinish: true, canExplode: true, explodeDist: 0.5,
+     spray: {fans: 42, fps: 24, count: 320, spread: 0.5, life: 1.1, size: 0.06, speed: 1.4}}
   ];
 
   /* esploso direzionato per hero3D2 (nodi del GLB):
@@ -90,6 +92,90 @@
     {url: 'assets/materials/finish-2.glb?v=1', name: 'Alluminio spazzolato', swatch: '#c8ccd2', fallback: {color: 0xc8ccd2, metalness: 0.9, roughness: 0.45}},
     {url: 'assets/materials/finish-3.glb?v=1', name: 'Nero opaco', swatch: '#222427', fallback: {color: 0x222427, metalness: 0.35, roughness: 0.85}}
   ];
+
+  /* --- SISTEMA SPRAY: particelle acquose runtime (nessun asset esterno).
+     ORIGINE E DIREZIONE CONFIGURABILI: spray.origin=[x,y,z] e spray.aim=[x,y,z]
+     (spazio locale del modello; default: centro zona alta, verso il basso). --- */
+  var sprayTex = null;
+  function sprayTexture(){
+    if (sprayTex) return sprayTex;
+    var c = document.createElement('canvas'); c.width = c.height = 64;
+    var g = c.getContext('2d');
+    var gr = g.createRadialGradient(32, 32, 2, 32, 32, 32);
+    gr.addColorStop(0, 'rgba(255,255,255,1)');
+    gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    sprayTex = new THREE.CanvasTexture(c);
+    return sprayTex;
+  }
+  function createSpray(cfg){
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(cfg.count * 3);
+    var vel = new Float32Array(cfg.count * 3);
+    var life = new Float32Array(cfg.count);
+    var st = new Float32Array(cfg.count);
+    for (var i = 0; i < cfg.count; i++){ pos[i*3+1] = 999; }
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    var mat = new THREE.PointsMaterial({
+      color: 0xbfe8ff, size: cfg.size, map: sprayTexture(), transparent: true, opacity: 0,
+      depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
+    });
+    var pts = new THREE.Points(geo, mat);
+    pts.frustumCulled = false;
+    pts.visible = false;
+    var aim = cfg.aim ? new THREE.Vector3(cfg.aim[0], cfg.aim[1], cfg.aim[2]) : new THREE.Vector3(0, -1, 0);
+    aim.normalize();
+    return {
+      pts: pts, pos: pos, vel: vel, life: life, st: st, active: false,
+      t: 0, dur: 0, next: 0, cfg: cfg, aim: aim,
+      origin: new THREE.Vector3(
+        cfg.origin ? cfg.origin[0] : 0,
+        cfg.origin ? cfg.origin[1] : 0.3,
+        cfg.origin ? cfg.origin[2] : 0)
+    };
+  }
+  function updateSpray(dt){
+    for (var i = 0; i < items.length; i++){
+      var it = items[i]; if (!it || !it.spraySys) continue;
+      var s = it.spraySys, cfg = s.cfg;
+      if (!s.active){
+        if (s.pts.visible) s.pts.visible = false;
+        continue;
+      }
+      s.t += dt;
+      var env = Math.min(1, s.t / 0.25) * Math.min(1, Math.max(0, (s.dur - s.t) / 0.3));
+      s.pts.material.opacity = env * 0.85;
+      if (s.t >= s.dur){
+        s.active = false; s.pts.visible = false;
+        continue;
+      }
+      s.next -= dt;
+      if (s.next <= 0){
+        s.next = 0.012;
+        var n = Math.floor(Math.random() * (cfg.count * 0.15)) + 4;
+        for (var k = 0; k < n; k++){
+          var si = Math.floor(Math.random() * cfg.count);
+          s.st[si] = 1; s.life[si] = cfg.life || 1.1;
+          s.pos[si*3]   = s.origin.x + (Math.random() - 0.5) * (cfg.spread || 0.4);
+          s.pos[si*3+1] = s.origin.y;
+          s.pos[si*3+2] = s.origin.z + (Math.random() - 0.5) * (cfg.spread || 0.4);
+          s.vel[si*3]   = s.aim.x * (Math.random() * 0.7 + 0.3) * (cfg.speed || 1.4) + (Math.random() - 0.5) * 0.35;
+          s.vel[si*3+1] = s.aim.y * (Math.random() * 0.7 + 0.3) * (cfg.speed || 1.4) + (Math.random() - 0.5) * 0.35;
+          s.vel[si*3+2] = s.aim.z * (Math.random() * 0.7 + 0.3) * (cfg.speed || 1.4) + (Math.random() - 0.5) * 0.35;
+        }
+      }
+      for (var p = 0; p < cfg.count; p++){
+        if (s.st[p] <= 0) continue;
+        s.life[p] -= dt;
+        if (s.life[p] <= 0){ s.st[p] = 0; s.pos[p*3+1] = 999; continue; }
+        s.vel[p*3+1] += dt * (cfg.gravity || 0.6);
+        s.pos[p*3]   += s.vel[p*3] * dt;
+        s.pos[p*3+1] += s.vel[p*3+1] * dt;
+        s.pos[p*3+2] += s.vel[p*3+2] * dt;
+      }
+      s.pts.geometry.attributes.position.needsUpdate = true;
+    }
+  }
 
   var group = new THREE.Group();
   /* offset: orbita spostata a destra per centrare la rotazione sul testo */
@@ -225,6 +311,33 @@
           localDir.normalize();
           items[i].parts.push({obj: o, base: o.position.clone(), dir: localDir});
         });
+      }
+
+      /* spray: origine dal config, oppure rilevata dal nodo nominato, altrimenti centro */
+      var scfg = MODELS[i].spray;
+      if (scfg){
+        var sys = createSpray(scfg);
+        if (!scfg.origin){
+          var found = null;
+          mesh.traverse(function(o){
+            if (!found && o.isMesh && /provett|bottle|tubo|vaso|ampoll|cilindr/i.test(o.name || '')) found = o;
+          });
+                    if (found){
+                      /* ancoraggio al BLOCCO PROVETTE: top del suo bounding box in spazio locale */
+                      var pb = new THREE.Box3().setFromObject(found);
+                      var pmin = pb.min.clone(), pmax = pb.max.clone();
+                      mesh.worldToLocal(pmin); mesh.worldToLocal(pmax);
+                      sys.origin.set((pmin.x + pmax.x) / 2, pmax.y + 0.02, (pmin.z + pmax.z) / 2);
+                    } else {
+                      var bb2 = new THREE.Box3().setFromObject(mesh);
+                      sys.origin.set(0, bb2.max.y * 0.6, 0);
+                    }
+        }
+        wrap.add(sys.pts);
+        items[i].spraySys = sys;
+        items[i].sprayFansT = (scfg.fans || 42) / (scfg.fps || 24);
+        window.__spray = window.__spray || [];
+        window.__spray[i] = sys;
       }
 
       pending--;
@@ -377,6 +490,7 @@
       it.mesh.visible = true;
     });
 
+    updateSpray(dt);
     renderer.render(scene, camera);
     updateCloseX();
     updateExplodeBtn();
@@ -476,11 +590,31 @@
       it.exploded = !it.exploded;
       var action = it.mixer.clipAction(it.clip);
       if (it.exploded){
-        action.paused = false;
-        it.mixer.timeScale = 1;
-        if (action.time >= action.getClip().duration - 0.05) action.time = 0;
+        /* sequenza bis: primo lo spray, poi la clip parte dal frame ventole (42) */
+        if (it.spraySys){
+          var fansT = it.sprayFansT || 0;
+          action.paused = true;
+          action.time = fansT;
+          it.mixer.timeScale = 1;
+          var sys = it.spraySys;
+          sys.active = true; sys.t = 0; sys.dur = fansT;
+          sys.pts.visible = true;
+          if (window.__sprayTimers) clearTimeout(window.__sprayTimers[i]);
+          window.__sprayTimers = window.__sprayTimers || {};
+          window.__sprayTimers[i] = setTimeout(function(){
+            if (it.exploded && it.mixer){
+              action.paused = false;
+              it.mixer.timeScale = 1;
+            }
+          }, Math.max(120, sys.dur * 1000));
+        } else {
+          action.paused = false;
+          it.mixer.timeScale = 1;
+          if (action.time >= action.getClip().duration - 0.05) action.time = 0;
+        }
       } else {
-        /* torna indietro fino all'inizio, poi si ferma */
+        if (it.spraySys){ it.spraySys.active = false; it.spraySys.pts.visible = false; }
+        if (window.__sprayTimers && window.__sprayTimers[i]){ clearTimeout(window.__sprayTimers[i]); }
         it.mixer.timeScale = -1;
         action.paused = false;
       }
