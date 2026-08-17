@@ -2,7 +2,7 @@
    Difensivo: ogni blocco verifica l'esistenza dei suoi elementi prima di agire. */
 (function(){
   document.documentElement.classList.add('js');
-  var THEME = document.documentElement.getAttribute('data-theme') || 'dark';
+  var THEME = document.documentElement.getAttribute('data-theme') || 'light';
 
   /* toggle tema */
   var ts = document.querySelector('.theme-switch');
