@@ -4,13 +4,19 @@
   document.documentElement.classList.add('js');
   var THEME = document.documentElement.getAttribute('data-theme') || 'light';
 
-  /* toggle tema */
+  /* toggle tema: scelta persistita in localStorage (applicata al load dallo script
+     inline nel <head> di ogni pagina, tema default = light). Sincronizzazione label. */
   var ts = document.querySelector('.theme-switch');
-  if (ts) ts.addEventListener('click', function(){
-    THEME = THEME === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', THEME);
-    var s = ts.querySelector('span'); if (s) s.textContent = THEME === 'dark' ? '☀ luce' : '☾ scuro';
-  });
+  if (ts){
+    var sp = ts.querySelector('span');
+    if (sp) sp.textContent = THEME === 'dark' ? '☀ luce' : '☾ scuro';
+    ts.addEventListener('click', function(){
+      THEME = THEME === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', THEME);
+      try{ localStorage.setItem('fac-theme', THEME); }catch(err){}
+      if (sp) sp.textContent = THEME === 'dark' ? '☀ luce' : '☾ scuro';
+    });
+  }
 
   /* menu mobile: hamburger + pannello (chiusura: link, Esc, click fuori) */
   var nt = document.querySelector('.nav-toggle');
@@ -96,7 +102,7 @@
     {type:'color', cls:'cc-lime'},
     {type:'brand', name:'Heltyair', cls:'cc-surface', href:'case-study/heltyair.html'},
     {type:'color', cls:'cc-lav'},
-    {type:'photo', name:'Bausola 3D', img:'assets/img/case-bausola.webp', href:'case-study/bausola-3d.html'},
+    {type:'photo', name:'Bausola', img:'assets/img/case-bausola.webp', href:'case-study/bausola-3d.html'},
     {type:'color', cls:'cc-lime'}
   ];
   function caseCard(c){
@@ -165,7 +171,18 @@
         if (!dragCase || dragCase.id !== e.pointerId) return;
         dragCase = null;
       }
-      rows.addEventListener('pointerup', endDrag);
+      rows.addEventListener('pointerup', function(e){
+        if (!dragCase || dragCase.id !== e.pointerId) return;
+        var isTap = Math.abs(dragDelta) <= 8;
+        endDrag(e);
+        if (isTap){
+          /* setPointerCapture ruba il click all'anchor (la naviga non parte):
+             se era un tap su una card, si naviga manualmente */
+          var el = document.elementFromPoint(e.clientX, e.clientY);
+          var a = el && el.closest ? el.closest('a.case-card') : null;
+          if (a && a.getAttribute('href')) window.location.href = a.getAttribute('href');
+        }
+      });
       rows.addEventListener('pointercancel', endDrag);
       rows.addEventListener('pointerleave', endDrag);
       /* evita che il drag inizi quando si clicca una card (navigazione) */
@@ -177,7 +194,8 @@
     }
 
     function caseLoop(){
-      if (!caseVisible || caseHover){ requestAnimationFrame(caseLoop); return; }
+      /* pausa durante drag/tap: la card deve essere ferma sotto puntatore/dito */
+      if (!caseVisible || caseHover || dragCase){ requestAnimationFrame(caseLoop); return; }
       if (caseReady && setA && setB){
         scrollVel *= 0.9;
         var base = 0.6, boost = Math.min(Math.abs(scrollVel) * 0.35, 14);
@@ -203,6 +221,55 @@
   /* hero title animation */
   var ht = document.getElementById('ht');
   if (ht) setTimeout(function(){ ht.classList.add('done'); }, 300);
+
+  /* icone Lottie sulle card servizi: i 3 JSON Lordicon (assets/lottie/) vengono
+     renderizzati da lottie-web. Play una volta quando la card entra in vista,
+     replay al hover. prefers-reduced-motion: frame finale fermo. */
+  var lottieEls = document.querySelectorAll('.card .glb.ico[data-lottie]');
+  var lottieAnims = [];
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  lottieEls.forEach(function(el){
+    if (typeof lottie === 'undefined') return;
+    var anim = lottie.loadAnimation({
+      container: el,
+      renderer: 'svg',
+      loop: false,
+      autoplay: false,
+      path: el.getAttribute('data-lottie')
+    });
+    anim.addEventListener('DOMLoaded', function(){
+      if (reduced){ anim.goToAndStop(anim.totalFrames - 1, true); }
+    });
+    lottieAnims.push({el: el, anim: anim, played: false});
+  });
+  var icoIO = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting){
+        lottieAnims.forEach(function(item){
+          if (item.el === e.target && !item.played){
+            item.played = true;
+            if (!reduced) item.anim.play();
+            else item.anim.goToAndStop(item.anim.totalFrames - 1, true);
+            icoIO.unobserve(e.target);
+          }
+        });
+      }
+    });
+  }, {threshold:.45});
+  lottieEls.forEach(function(el){ icoIO.observe(el); });
+  /* micro-bob al hover: replay dell'animazione della card quando ci passi sopra */
+  lottieAnims.forEach(function(item){
+    var card = item.el.closest('.card');
+    if (!card) return;
+    card.addEventListener('mouseenter', function(){
+      if (reduced || !item.played) { item.anim.goToAndStop(item.anim.totalFrames - 1, true); return; }
+      item.anim.goToAndPlay(0, true);
+    });
+    card.addEventListener('touchstart', function(){
+      if (reduced || !item.played) return;
+      item.anim.goToAndPlay(0, true);
+    }, {passive:true});
+  });
 
   /* reveal on scroll + counters + steps */
   var io = new IntersectionObserver(function(entries){

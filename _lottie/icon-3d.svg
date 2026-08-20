@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- cubo 3D isometrico: hole = struttura principale -->
+  <g data-hole="1">
+    <path d="M 100 34 L 154 61 L 154 139 L 100 166 L 46 139 L 46 61 Z" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 100 34 L 100 166" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 46 61 L 100 88 L 154 61" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 100 88 L 100 166" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+    <path d="M 46 139 L 100 166" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <!-- label: ink = etichetta di contorno -->
+  <g data-ink="1">
+    <path d="M 100 34 L 100 12 L 180 12 L 180 68 L 154 61" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

@@ -1,5 +1,6 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="it" data-theme="light">
+<script>(function(){try{var t=localStorage.getItem('fac-theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t)}}catch(e){}})();</script>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -103,7 +104,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.1.titolo}}<small>{{servizio.1.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-configuratori.webp" alt="Configuratore 3D di prodotti industriali" loading="lazy" decoding="async"></div>
+        <div class="glb ico" role="img" aria-label="Icona Configuratori 3D (animata)" data-lottie="assets/lottie/icon-configuratori.json"></div>
       </div>
     </section>
     <section class="card c-g">
@@ -114,7 +115,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.2.titolo}}<small>{{servizio.2.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-video.webp" alt="Animazioni tecniche e video di prodotto" loading="lazy" decoding="async"></div>
+        <div class="glb ico" role="img" aria-label="Icona Render e Animazioni (animata)" data-lottie="assets/lottie/icon-render.json"></div>
       </div>
     </section>
     <section class="card c-l">
@@ -125,7 +126,7 @@
       </div>
       <div class="mid">
         <div class="ttl">{{servizio.3.titolo}}<small>{{servizio.3.desc}}</small></div>
-        <div class="glb"><img src="assets/img/card-ai.webp" alt="Applicazioni AI per la manifattura" loading="lazy" decoding="async"></div>
+        <div class="glb ico" role="img" aria-label="Icona AI applicata (animata)" data-lottie="assets/lottie/icon-ai.json"></div>
       </div>
     </section>
   </div>
@@ -251,6 +252,7 @@
   </div>
 </footer>
 
+<script src="assets/lottie/lottie.min.js"></script>
 <script src="assets/js/main-11.js"></script>
 <script src="assets/js/vendor/three.min.js"></script>
 <script src="assets/js/vendor/GLTFLoader.js"></script>

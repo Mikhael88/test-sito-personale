@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- pellicola: rettangolo + perforazioni (hole) -->
+  <g data-hole="1">
+    <path d="M 40 40 L 160 40 L 160 160 L 40 160 Z" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 62 26 L 62 54 M 138 26 L 138 54 M 62 146 L 62 174 M 138 146 L 138 174" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <!-- strisce in movimento: ink = dettaglio che scorre -->
+  <g data-ink="1">
+    <path d="M 55 78 L 145 78 M 55 100 L 145 100 M 55 122 L 145 122" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  </g>
+</svg>

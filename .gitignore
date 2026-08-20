@@ -7,3 +7,7 @@ _archive/
 
 # artefatto critica impeccable (snapshot locali)
 .impeccable/
+
+# dipendenze/dati locali non pubblicabili
+node_modules/
+dsh-out/

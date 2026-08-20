@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- rounded square (chip): hole = struttura principale -->
+  <g data-hole="1">
+    <path d="M 60 40 L 140 40 Q 156 40 156 56 L 156 144 Q 156 160 140 160 L 60 160 Q 44 160 44 144 L 44 56 Q 44 40 60 40 Z" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 44 78 L 28 78 M 44 122 L 28 122 M 156 78 L 172 78 M 156 122 L 172 122 M 78 44 L 78 28 M 122 44 L 122 28 M 78 156 L 78 172 M 122 156 L 122 172" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  </g>
+  <!-- nodo centrale: ink = accento -->
+  <g data-ink="1">
+    <circle cx="100" cy="100" r="16" fill="none" stroke="currentColor" stroke-width="9"/>
+    <path d="M 100 84 L 100 62 M 84 100 L 62 100 M 100 116 L 100 138 M 116 100 L 138 100" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+  </g>
+</svg>
