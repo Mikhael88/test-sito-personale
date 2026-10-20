@@ -98,9 +98,9 @@
     {type:'color', cls:'cc-lav'},
     {type:'photo', name:'DND', img:'assets/img/case-dnd.webp', href:'case-study/dnd-martinelli.html'},
     {type:'color', cls:'cc-surface'},
-    {type:'brand', name:'Robosan', cls:'cc-lav', href:'case-study/robosan.html'},
+    {type:'photo', name:'Robosan', img:'assets/img/case-robosan.webp', href:'case-study/robosan.html'},
     {type:'color', cls:'cc-lime'},
-    {type:'brand', name:'Heltyair', cls:'cc-surface', href:'case-study/heltyair.html'},
+    {type:'photo', name:'Heltyair', img:'assets/img/case-heltyair.webp', href:'case-study/heltyair.html'},
     {type:'color', cls:'cc-lav'},
     {type:'photo', name:'Bausola', img:'assets/img/case-bausola.webp', href:'case-study/bausola-3d.html'},
     {type:'color', cls:'cc-lime'}
@@ -129,14 +129,14 @@
     var cIO = new IntersectionObserver(function(en){ en.forEach(function(e){ caseVisible = e.isIntersecting; }); }, {rootMargin:'120px 0px'});
     var rowsHost = document.querySelector('.case-rows'); if (rowsHost) cIO.observe(rowsHost);
     /* frecce del carosello (navigazione esplicita, oltre al drag) */
+    /* le frecce spostano ENTRAMBE le righe (direzioni opposte) con easing fluido:
+       navLeft = pixel residui da percorrere, consumati a ogni frame in caseLoop */
+    var navLeft = 0;
     document.querySelectorAll('.car-btn').forEach(function(b){
       b.addEventListener('click', function(){
         if (!setA) return;
         var dir = b.dataset.dir === '1' ? -1 : 1;
-        posA += dir * (setA / CASES.length);
-        while (posA <= -setA) posA += setA;
-        while (posA > 0) posA -= setA;
-        var a = document.getElementById('case-a'); if (a) a.style.transform = 'translateX(' + posA + 'px)';
+        navLeft += dir * (setA / CASES.length);
       });
     });
     window.addEventListener('scroll', function(){ var y = window.scrollY; scrollVel = y - lastY; lastY = y; }, {passive:true});
@@ -195,7 +195,20 @@
 
     function caseLoop(){
       /* pausa durante drag/tap: la card deve essere ferma sotto puntatore/dito */
-      if (!caseVisible || caseHover || dragCase){ requestAnimationFrame(caseLoop); return; }
+      if (!caseVisible || dragCase){ requestAnimationFrame(caseLoop); return; }
+      /* easing delle frecce (anche col mouse sopra i bottoni/righe) */
+      if (caseReady && setA && setB && Math.abs(navLeft) > 0.5){
+        var stepNav = navLeft * 0.12;
+        posA += stepNav; posB -= stepNav; navLeft -= stepNav;
+        while (posA <= -setA) posA += setA;
+        while (posA > 0) posA -= setA;
+        while (posB >= 0) posB -= setB;
+        while (posB < -setB) posB += setB;
+        var na = document.getElementById('case-a'); if (na) na.style.transform = 'translateX('+posA+'px)';
+        var nb = document.getElementById('case-b'); if (nb) nb.style.transform = 'translateX('+posB+'px)';
+        requestAnimationFrame(caseLoop); return;
+      }
+      if (caseHover){ requestAnimationFrame(caseLoop); return; }
       if (caseReady && setA && setB){
         scrollVel *= 0.9;
         var base = 0.6, boost = Math.min(Math.abs(scrollVel) * 0.35, 14);

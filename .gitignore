@@ -11,3 +11,10 @@ _archive/
 # dipendenze/dati locali non pubblicabili
 node_modules/
 dsh-out/
+
+# Regole critiche AGENTS.md
+assets/img/card-ai-picco.svg
+assets/img/card-ai-test.svg
+*.blend
+*.blend1
+.env

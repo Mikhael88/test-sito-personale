@@ -593,6 +593,7 @@
   var DETAIL = null;      // indice dell'oggetto ingrandito a destra (o null)
   var savedRot = null;    // rotazione del mesh salvata al momento del focus
   var dragging = false, dragObj = null;
+  var hoverIdx = -1;
   var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
 
   /* --- stato materiali --- */
@@ -700,7 +701,9 @@
       it.wrap.position.x += (tp.x - it.wrap.position.x) * 0.06;
       it.wrap.position.y += (tp.y - it.wrap.position.y) * 0.06;
       it.wrap.position.z += (tp.z - it.wrap.position.z) * 0.06;
-      var ns = it.wrap.scale.x + (tp.s - it.wrap.scale.x) * 0.06;
+      /* micro-zoom morbido limitato a +7% (range 5-10%) su hover in idle */
+      var targetS = tp.s * (DETAIL === null && hoverIdx === i ? 1.07 : 1.0);
+      var ns = it.wrap.scale.x + (targetS - it.wrap.scale.x) * 0.08;
       it.wrap.scale.setScalar(ns);
       if (DETAIL === null){
         /* idle: wrap stabile (niente rotazione di fase), solo il mesh ruota su
@@ -740,6 +743,7 @@
     updateExplodeBtn();
     updatePlayBtn();
     updateMaterialCallout();
+    updateHintPill();
   }
   requestAnimationFrame(loop);
 
@@ -809,6 +813,88 @@
     closeBtn.style.display = 'block';
     closeBtn.style.left = (x + 30) + 'px';
     closeBtn.style.top = (y - 70) + 'px';
+  }
+
+  /* --- hint interattivo per la hero 3D --- */
+  var hintPill = document.createElement('div');
+  hintPill.className = 'hero3d-hint';
+  hintPill.setAttribute('aria-hidden', 'true');
+  hintPill.innerHTML = '<span class="hero3d-hint-dot"></span><span class="hero3d-hint-txt">Esplora 3D ↺</span>';
+  document.body.appendChild(hintPill);
+
+  var hintDismissed = false;
+  try {
+    if (sessionStorage.getItem('fac-3d-hint') === '1') hintDismissed = true;
+  } catch(e){}
+
+  function dismissHint(){
+    if (!hintDismissed){
+      hintDismissed = true;
+      try { sessionStorage.setItem('fac-3d-hint', '1'); } catch(e){}
+      if (hintPill){
+        hintPill.classList.remove('is-visible');
+      }
+    }
+  }
+
+  function updateHintPill(){
+    if (!hintPill) return;
+    if (hintDismissed || DETAIL !== null){
+      if (hintPill.classList.contains('is-visible')){
+        hintPill.classList.remove('is-visible');
+      }
+      return;
+    }
+    var rect = canvas.getBoundingClientRect();
+    if (rect.bottom < 120 || rect.top > (window.innerHeight || 800) - 120){
+      if (hintPill.classList.contains('is-visible')){
+        hintPill.classList.remove('is-visible');
+      }
+      return;
+    }
+
+    var bestScreen = null;
+    /* Se l'utente sta facendo hover su un modello, ancora l'hint direttamente ad esso */
+    if (hoverIdx >= 0 && items[hoverIdx] && items[hoverIdx].ready){
+      var hp = new THREE.Vector3();
+      items[hoverIdx].wrap.getWorldPosition(hp);
+      hp.project(camera);
+      bestScreen = {
+        x: (hp.x * 0.5 + 0.5) * rect.width + rect.left,
+        y: (-hp.y * 0.5 + 0.5) * rect.height + rect.top
+      };
+    } else {
+      /* Altrimenti cerca il modello sul quadrante destro e più in primo piano */
+      var bestWeight = -999;
+      for (var i = 0; i < items.length; i++){
+        var it = items[i]; if (!it || !it.ready) continue;
+        var p = new THREE.Vector3();
+        it.wrap.getWorldPosition(p);
+        p.project(camera);
+        if (p.x > 0.15 && p.x < 0.90 && p.y > -0.72 && p.y < 0.72 && p.z < 0.98){
+          var weight = p.x * 2.0 - p.z;
+          if (weight > bestWeight){
+            bestWeight = weight;
+            bestScreen = {
+              x: (p.x * 0.5 + 0.5) * rect.width + rect.left,
+              y: (-p.y * 0.5 + 0.5) * rect.height + rect.top
+            };
+          }
+        }
+      }
+    }
+
+    if (bestScreen){
+      hintPill.style.left = Math.round(bestScreen.x) + 'px';
+      hintPill.style.top = Math.round(bestScreen.y + 70) + 'px';
+      if (!hintPill.classList.contains('is-visible')){
+        hintPill.classList.add('is-visible');
+      }
+    } else {
+      if (hintPill.classList.contains('is-visible')){
+        hintPill.classList.remove('is-visible');
+      }
+    }
   }
 
   /* il bottone Esplodi segue l'oggetto in focus (sotto di esso).
@@ -1044,24 +1130,58 @@
     if (i < 0) return;
     dragObj = i; dragging = true; moved = false;
     downX = e.clientX; downY = e.clientY;
+    if (DETAIL === i){
+      canvas.style.cursor = 'grabbing';
+    }
     canvas.setPointerCapture(e.pointerId);
   });
+
   canvas.addEventListener('pointermove', function(e){
-    if (!dragging || dragObj === null) return;
-    var dx = e.clientX - downX, dy = e.clientY - downY;
-    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
-    if (DETAIL === dragObj){
-      /* ruota l'oggetto grande a 360° */
-      items[dragObj].mesh.rotation.y += dx * 0.008;
-      items[dragObj].mesh.rotation.x += dy * 0.004;
-      downX = e.clientX; downY = e.clientY;
+    if (dragging && dragObj !== null){
+      var dx = e.clientX - downX, dy = e.clientY - downY;
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) moved = true;
+      if (DETAIL === dragObj){
+        /* ruota l'oggetto grande a 360° */
+        items[dragObj].mesh.rotation.y += dx * 0.008;
+        items[dragObj].mesh.rotation.x += dy * 0.004;
+        downX = e.clientX; downY = e.clientY;
+      }
+      return;
+    }
+    /* gestione hover e cursore in idle e in focus */
+    var hit = meshAt(e.clientX, e.clientY);
+    hoverIdx = hit;
+    if (DETAIL === null){
+      canvas.style.cursor = (hit >= 0) ? 'pointer' : 'default';
+    } else {
+      if (hit === DETAIL){
+        canvas.style.cursor = 'grab';
+      } else if (hit >= 0){
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'default';
+      }
     }
   });
+
+  canvas.addEventListener('pointerleave', function(){
+    hoverIdx = -1;
+    if (!dragging) canvas.style.cursor = 'default';
+  });
+
   function onUp(e){
     if (!dragging) return;
     var i = dragObj;
     dragging = false; dragObj = null;
+    var hit = meshAt(e.clientX, e.clientY);
+    if (DETAIL === i) canvas.style.cursor = 'grab';
+    else if (hit >= 0) canvas.style.cursor = 'pointer';
+    else canvas.style.cursor = 'default';
     if (moved || i < 0) return;
+
+    /* qualsiasi click valido su un modello dismette l'hint per sempre */
+    dismissHint();
+
     if (DETAIL === null){
       /* attiva il focus e salva la rotazione corrente per il ripristino */
       DETAIL = i;
@@ -1226,7 +1346,10 @@
   } /* fine: startHero */
   /* boot differito: parte quando il browser è libero, così non blocca il primo render */
   var _hc = document.getElementById('hero3d');
-  if (_hc){
+  /* mobile (<=900px): il canvas è nascosto via CSS, quindi niente WebGL/HDR/GLB/Draco
+     (evita ~5 MB di download e GPU sprecata su smartphone) */
+  var _mobile = window.matchMedia && window.matchMedia('(max-width: 900px)').matches;
+  if (_hc && !_mobile){
     var _boot = function(){ startHero(); };
     if (window.requestIdleCallback) window.requestIdleCallback(_boot, {timeout: 1500});
     else setTimeout(_boot, 300);
