@@ -1,0 +1,31 @@
+# Solo file del sito pubblico su Vercel
+node_modules/
+.git/
+.github/
+.vercel/
+
+# stato del loop agentico e doc interne
+BOARD.md
+LEDGER.md
+
+# documentazione/dev tool (non fanno parte del sito)
+README.md
+GUIDA-CONTENUTI.md
+CRITIQUE.md
+PRODUCT.md
+REPORT-LAVORO-NOTTURNO.md
+build.py
+estraggi_testi.py
+deliver_check.py
+validate_site.py
+content/
+template/
+dsh-out/
+_lottie/
+.impeccable/
+.wayfinder/
+
+# sorgenti e segreti
+*.blend
+*.blend1
+.env*
