@@ -24,12 +24,12 @@ Consulente Digitalizzazione Prodotto con 15+ anni di esperienza in 3D. Aiuto le 
 - LinkedIn
 
 ## Pagine
-- [Homepage](https://www.faccioli.it/)
-- [Servizi](https://www.faccioli.it/servizi.html)
-- [Configuratori 3D](https://www.faccioli.it/servizio/configuratori-3d.html)
-- [Render e Animazioni](https://www.faccioli.it/servizio/video-animazioni-tecniche.html)
-- [AI applicata](https://www.faccioli.it/servizio/ai-applicata.html)
-- [Ricostruzione 3D](https://www.faccioli.it/servizio/ricostruzione-3d.html)
-- [Case history](https://www.faccioli.it/case-history.html)
-- [Blog](https://www.faccioli.it/blog.html)
-- [Contatti](https://www.faccioli.it/contatti.html)
+- [Homepage](https://michelefaccoli.com/)
+- [Servizi](https://michelefaccoli.com/servizi.html)
+- [Configuratori 3D](https://michelefaccoli.com/servizio/configuratori-3d.html)
+- [Render e Animazioni](https://michelefaccoli.com/servizio/video-animazioni-tecniche.html)
+- [AI applicata](https://michelefaccoli.com/servizio/ai-applicata.html)
+- [Ricostruzione 3D](https://michelefaccoli.com/servizio/ricostruzione-3d.html)
+- [Case history](https://michelefaccoli.com/case-history.html)
+- [Blog](https://michelefaccoli.com/blog.html)
+- [Contatti](https://michelefaccoli.com/contatti.html)
